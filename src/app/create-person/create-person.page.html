@@ -1,0 +1,117 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Form
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Create Person</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form [formGroup]="personForm" (ngSubmit)="submitData()">
+        
+        <ion-item lines="none">
+          <ion-label position="stacked">Given Name</ion-label>
+          <ion-input  formControlName="givenName"label-placement="floating" fill="outline" placeholder="Enter Given Name"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">Family Name</ion-label>
+          <ion-input  formControlName="familyName" label-placement="floating" fill="outline" placeholder="Enter Family Name"></ion-input>
+
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Gender</ion-label>
+          <ion-select formControlName="gender">
+            <ion-select-option value="male">Male</ion-select-option>
+            <ion-select-option value="female">Female</ion-select-option>
+            <ion-select-option value="other">Other</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">Birthdate</ion-label>
+          <ion-input type="date" formControlName="birthdate"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">Address 1</ion-label>
+          <ion-input  formControlName="address1" label-placement="floating" fill="outline" placeholder="Address 1"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">City/Village</ion-label>
+          <ion-input  formControlName="cityVillage" label-placement="floating" fill="outline" placeholder="Enter City or Village"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">Postal Code</ion-label>
+          <ion-input  formControlName="postalCode" label-placement="floating" fill="outline" placeholder="Enter Postal Code"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">County District</ion-label>
+          <ion-input  formControlName="countyDistrict" label-placement="floating" fill="outline" placeholder="Enter County District"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">State/Province</ion-label>
+          <ion-input  formControlName="stateProvince" label-placement="floating" fill="outline" placeholder="Enter State/Province"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" >
+          <ion-label position="stacked">Address 4</ion-label>
+          <ion-input  formControlName="address4" label-placement="floating" fill="outline" placeholder="Enter Address 4"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" [disabled]="personForm.invalid">
+          Submit
+        </ion-button>
+
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="createdPeople.length > 0">
+    <ion-card-header>
+      <ion-card-title>Saved People</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <table>
+        <tr>
+          <th>Given Name</th>
+          <th>Family Name</th>
+          <th>Gender</th>
+          <th></th>
+        </tr>
+        <tr *ngFor="let person of createdPeople">
+          <td>{{ person.givenName }}</td>
+          <td>{{ person.familyName }}</td>
+          <td>{{ person.gender }}</td>
+          <td>
+            <ion-button (click)="editPerson(person.uuid)">Edit</ion-button>
+          </td>
+          <td>
+            <ion-button color="danger" (click)="deletePerson(person.uuid)">
+              Delete
+            </ion-button>
+          </td>          
+        </tr>
+      </table>
+      
+      
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

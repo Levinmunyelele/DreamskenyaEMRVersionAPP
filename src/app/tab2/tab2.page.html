@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Visits
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Display a loading spinner while data is being fetched -->
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+  <!-- Display error message if API call fails -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Display visits data if available -->
+  <ion-list *ngIf="visits && visits.length > 0">
+    <ion-item *ngFor="let visit of visits">
+      <ion-label>
+        <h2>{{ visit.visitType?.display }}</h2>  <!-- Safe navigation operator in case visitType is null -->
+        <p>Patient: {{ visit.patient?.person?.display }}</p>
+        <p>Location: {{ visit.location?.name }}</p>
+        <p>Start Date: {{ visit.startDatetime }}</p>
+        <p>End Date: {{ visit.stopDatetime }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Message if no visits data is found -->
+  <div *ngIf="!loading && (!visits || visits.length === 0)">
+    <p>No visits found.</p>
+  </div>
+</ion-content>

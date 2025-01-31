@@ -1,0 +1,64 @@
+/* Styling for the table container to allow horizontal scrolling */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+/* Styling for the table itself */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.styled-table th {
+  background-color: #45257d;
+  color: #fff;
+  font-weight: bold;
+}
+
+.styled-table td {
+  font-size: 13px;
+}
+
+.styled-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* For the expanded row content */
+.styled-table tr td[colspan="6"] {
+  background-color: #f1f1f1;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.no-data-message {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Buttons inside the table */
+.styled-table td ion-button {
+  margin-right: 10px;
+}
+
+/* Adjustments for mobile devices */
+@media (max-width: 768px) {
+  .styled-table th, .styled-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+  .styled-table {
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Screening Form</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="screening"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Screening Information</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <!-- Display message if no data -->
+      <p class="no-data-message" *ngIf="!displayedRows.length">No data available.</p>
+
+      <!-- Table container to allow scrolling if necessary -->
+      <div class="table-container">
+        <table class="styled-table" *ngIf="displayedRows.length">
+          <thead>
+            <tr>
+              <th>Dreams ID</th>
+              <th>Date of Encounter</th>
+              <th>Provider</th>
+              <th>Marital Status</th>
+              <th>Eligibility</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Correct scope for row -->
+            <ng-container *ngFor="let row of displayedRows; let i = index">
+              <tr>
+                <td>{{ row.dreamsId }}</td>
+                <td>{{ row.dateOfEncounter }}</td>
+                <td>{{ row.provider }}</td>
+                <td>{{ row.maritalStatus }}</td>
+                <td>{{ row.eligibility }}</td>
+                <td>
+                  <ion-button size="small" (click)="toggleRow(row)">
+                    {{ row.isExpanded ? 'Collapse' : 'Expand' }}
+                  </ion-button>
+                  <ion-button color="danger" size="small" (click)="deleteRow(i)">
+                    Delete
+                  </ion-button>
+                </td>
+              </tr>
+
+              <!-- Expanded Row Details -->
+              <tr *ngIf="row.isExpanded">
+                <td colspan="6">
+                  <ion-card-content *ngFor="let field of row.allFields">
+                    <p><strong>{{ field.field.description }}:</strong> {{ field.field.name }}</p>
+                  </ion-card-content>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

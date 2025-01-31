@@ -1,0 +1,81 @@
+/* Styling the ion-header */
+ion-header {
+    --background: #f4f4f4;
+    /* Light background color */
+}
+
+ion-toolbar {
+    --background: #24247b;
+    /* Dark blue background for the toolbar */
+}
+
+ion-title {
+    color: white;
+    /* White text color for the title */
+}
+
+/* Styling the content area */
+ion-content {
+    --background: #ffffff;
+    padding: 16px;
+}
+
+/* Loading spinner styles */
+ion-spinner {
+    display: block;
+    margin: 100px auto;
+    /* Center spinner on the page */
+}
+
+/* Error message styles */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    /* Dark red text */
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Visits list styling */
+ion-list {
+    margin-top: 20px;
+    /* Add some space between the content and the list */
+}
+
+ion-item {
+    background-color: #f9f9f9;
+    /* Light gray background for each item */
+    margin-bottom: 10px;
+    /* Add some space between items */
+    padding: 15px;
+    border-radius: 8px;
+    /* Rounded corners for each item */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+}
+
+/* Styling the labels inside each ion-item */
+ion-item ion-label h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #24247b;
+    /* Dark blue color for the title */
+}
+
+ion-item ion-label p {
+    font-size: 14px;
+    color: #555;
+    /* Gray color for the description */
+    margin: 5px 0;
+}
+
+/* No visits message styling */
+div {
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+    /* Dark gray color for the text */
+    margin-top: 20px;
+}

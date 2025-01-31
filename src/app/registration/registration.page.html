@@ -1,0 +1,123 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Registration Form</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()"> 
+
+    <!-- Basic Information Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Basic Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let question of questions.slice(0, 7)">
+          <div class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <ion-select [formControlName]="question.label">
+                <ion-select-option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <ion-input type="text" [formControlName]="question.label"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <ion-input type="number" [formControlName]="question.label"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <ion-input type="date" [formControlName]="question.label" [min]="minYear" [max]="maxYear"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'radio'">
+              <label>{{ question.label }}</label>
+              <ion-radio-group [formControlName]="question.label">
+                <ion-item *ngFor="let option of question.options">
+                  <ion-label>{{ option.label }}</ion-label>
+                  <ion-radio [value]="option.value"></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Contact Details Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Contact Details</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let question of questions.slice(7, 16)">
+          <div class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <ion-select [formControlName]="question.label">
+                <ion-select-option *ngFor="let option of question.options" [value]="option.label">
+                  {{ option.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <ion-input type="text" [formControlName]="question.label"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <ion-input type="number" [formControlName]="question.label"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <ion-input type="date" [formControlName]="question.label" [min]="minYear" [max]="maxYear"></ion-input>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Demographics Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Demographics</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let question of questions.slice(16)">
+          <div class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <ion-select [formControlName]="question.label">
+                <ion-select-option *ngFor="let option of question.options" [value]="option.label">
+                  {{ option.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <ion-input type="text" [formControlName]="question.label"></ion-input>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <ion-input type="date" [formControlName]="question.label" [min]="minYear" [max]="maxYear"></ion-input>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Submit Button -->
+    <ion-button type="submit" expand="full" [disabled]="registrationForm.invalid">
+      Submit
+    </ion-button>
+
+  </form>
+</ion-content>

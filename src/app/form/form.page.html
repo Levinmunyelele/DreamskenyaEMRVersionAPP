@@ -1,0 +1,239 @@
+<!-- src/app/pages/form/form.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Form Data</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="formData; else loading" class="ion-padding">
+  <ion-card *ngIf="formData">
+    <ion-card-header class="card-header">
+      <ion-card-title>Form Details</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <form [formGroup]="formGroup" (ngSubmit)="submitForm()">
+  
+        <!-- Encounter Date -->
+        <ion-item lines="none">
+          <ion-label class="label">Encounter Date</ion-label>
+          <ion-input  class="input" type="date" formControlName="encounterDate"></ion-input>
+        </ion-item>
+      
+        <!-- Provider -->
+        <ion-item lines="none">
+          <ion-label class="label">Provider</ion-label>
+          <ion-input placeholder="Provider Name" formControlName="provider"></ion-input>
+        </ion-item>
+      
+        <!-- Location -->
+        <ion-item lines="none">
+          <ion-label class="label">Location</ion-label>
+          <ion-input placeholder="Location" formControlName="location"></ion-input>
+        </ion-item>
+      
+        <!-- Ever Enrolled In Dreams -->
+        <ion-item lines="none">
+          <ion-label class="label">Ever Enrolled In Dreams</ion-label>
+          <ion-select formControlName="everEnrolledInDreams">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Enter Dreams ID -->
+        <ion-item lines="none">
+          <ion-label class="label">Enter Dreams ID</ion-label>
+          <ion-input placeholder="Dreams ID" formControlName="enterDreamsId"></ion-input>
+        </ion-item>
+      
+        <!-- Marital Status -->
+        <ion-item lines="none">
+          <ion-label class="label">Marital Status</ion-label>
+          <ion-select formControlName="maritalStatus">
+            <ion-select-option value="Single">Single</ion-select-option>
+            <ion-select-option value="Married">Married</ion-select-option>
+            <ion-select-option value="Separated">Separated</ion-select-option>
+            <ion-select-option value="Widowed">Widowed</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <ion-item lines="none">
+          <ion-label class="label">Who Do You Live With</ion-label>
+          <ion-select formControlName="whoDoYouLiveWith">
+            <ion-select-option value="Lives with friends">Lives with friends</ion-select-option>
+            <ion-select-option value="Lives with parents">Lives with parents</ion-select-option>
+            <ion-select-option value="Lives with siblings">Lives with siblings</ion-select-option>
+          </ion-select>
+        </ion-item>
+        
+        <ion-item lines="none">
+          <ion-label class="label">Disability</ion-label>
+          <ion-input placeholder="Disability Information" formControlName="disability"></ion-input>
+        </ion-item>
+      
+        <ion-item lines="none">
+          <ion-label class="label">State Disability Type</ion-label>
+          <ion-select formControlName="stateDisabilityType">
+            <ion-select-option value="Hearing Loss">Hearing Loss</ion-select-option>
+            <ion-select-option value="Impaired Speech">Impaired Speech</ion-select-option>
+            <ion-select-option value="Mental Disability">Mental Disability</ion-select-option>
+            <ion-select-option value="Visual Impairment">Visual Impairment</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Caregiver First Name -->
+        <ion-item lines="none">
+          <ion-label class="label">Caregiver First Name</ion-label>
+          <ion-input placeholder="First Name" formControlName="caregiverFirstName"></ion-input>
+        </ion-item>
+      
+        <!-- Caregiver Middle Name -->
+        <ion-item lines="none">
+          <ion-label class="label">Caregiver Middle Name</ion-label>
+          <ion-input placeholder="Middle Name" formControlName="caregiverMiddleName"></ion-input>
+        </ion-item>
+      
+        <!-- Caregiver Surname -->
+        <ion-item lines="none">
+          <ion-label class="label">Caregiver Surname</ion-label>
+          <ion-input placeholder="Surname" formControlName="caregiverSurname"></ion-input>
+        </ion-item>
+      
+        <!-- Caregiver Occupation -->
+        <ion-item lines="none">
+          <ion-label class="label">Caregiver Occupation</ion-label>
+          <ion-input placeholder="Occupation" formControlName="caregiverOccupation"></ion-input>
+        </ion-item>
+      
+        <!-- Out Of School -->
+        <ion-item lines="none">
+          <ion-label class="label">Out Of School</ion-label>
+          <ion-select formControlName="outOfSchool">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Ever Had Sex -->
+        <ion-item lines="none">
+          <ion-label class="label">Ever Had Sex</ion-label>
+          <ion-select formControlName="everHadSex">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Sexual Partners -->
+        <ion-item lines="none">
+          <ion-label class="label">Sexual Partners</ion-label>
+          <ion-input placeholder="Number of Partners" formControlName="sexualPartners"></ion-input>
+        </ion-item>
+      
+        <!-- Received Gifts For Sex -->
+        <ion-item lines="none">
+          <ion-label class="label">Received Gifts For Sex</ion-label>
+          <ion-select formControlName="receivedGiftsForSex">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Diagnosed STI -->
+        <ion-item lines="none">
+          <ion-label class="label">Diagnosed STI</ion-label>
+          <ion-input placeholder="STI Details" formControlName="diagnosedSTI"></ion-input>
+        </ion-item>
+      
+        <!-- Has Child -->
+        <ion-item lines="none">
+          <ion-label class="label">Has Child</ion-label>
+          <ion-select formControlName="hasChild">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Sexual Partners Last 12 Months -->
+        <ion-item lines="none">
+          <ion-label class="label">Sexual Partners Last 12 Months</ion-label>
+          <ion-input placeholder="Number of Partners" formControlName="sexualPartnersLast12Months"></ion-input>
+        </ion-item>
+      
+        <!-- Ever Had An STI -->
+        <ion-item lines="none">
+          <ion-label class="label">Ever Had An STI</ion-label>
+          <ion-select formControlName="everHadAnSTI">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Underwent GBV -->
+        <ion-item lines="none">
+          <ion-label class="label">Underwent GBV</ion-label>
+          <ion-select formControlName="undergoneGBV">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Head Of Household -->
+        <ion-item lines="none">
+          <ion-label class="label">Head Of Household</ion-label>
+          <ion-input placeholder="Name" formControlName="headOfHousehold"></ion-input>
+        </ion-item>
+      
+        <!-- Used Drugs -->
+        <ion-item lines="none">
+          <ion-label class="label">Used Drugs</ion-label>
+          <ion-select formControlName="usedDrugs">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Is Orphan -->
+        <ion-item lines="none">
+          <ion-label class="label">Is Orphan</ion-label>
+          <ion-select formControlName="isOrphan">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Comment -->
+        <ion-item lines="none">
+          <ion-label class="label">Comment</ion-label>
+          <ion-input placeholder="Add Comments" formControlName="comment"></ion-input>
+        </ion-item>
+      
+        <!-- Is Eligible -->
+        <ion-item lines="none">
+          <ion-label class="label">Is Eligible</ion-label>
+          <ion-select formControlName="isEligible">
+            <ion-select-option value="Yes">Yes</ion-select-option>
+            <ion-select-option value="No">No</ion-select-option>
+          </ion-select>
+        </ion-item>
+      
+        <!-- Submit Button -->
+        <ion-button expand="full" type="submit" [disabled]="!formGroup.valid">
+          Submit
+        </ion-button>
+      
+      </form>
+      
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ng-template #loading>
+  <ion-item lines="none">
+    <ion-label class="label">Loading...</ion-label>
+  </ion-item>
+</ng-template>
+
+<p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>

@@ -1,0 +1,36 @@
+/* Add this to the component's CSS (screened-agwy.page.scss) */
+
+.loading-container,
+.error-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-container ion-spinner {
+  margin-bottom: 10px;
+}
+
+.error-container p {
+  color: red;
+  font-weight: bold;
+}
+
+.table-container {
+  margin-top: 20px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.data-table th {
+  background-color: #f4f4f4;
+}

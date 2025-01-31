@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Person Attributes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="personForm">
+    <!-- Dynamically generate input fields for each attribute -->
+    <ion-card *ngFor="let attribute of attributes">
+      <ion-card-header>
+        <ion-card-title>{{ attribute.display }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-input
+          [formControlName]="attribute.display"
+          placeholder="Enter {{ attribute.display }}"
+        ></ion-input>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="full" (click)="savePersonData()">
+      Save Data
+    </ion-button>
+  </form>
+</ion-content>

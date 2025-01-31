@@ -1,0 +1,669 @@
+<ion-header>
+
+  <ion-toolbar color="primary">
+
+    <ion-title>Enrollment Form</ion-title>
+
+    <ion-buttons slot="start">
+
+      <ion-back-button default-href="home"></ion-back-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+  <form [formGroup]="enrollmentForm" (ngSubmit)="submitForm()">
+
+    <ion-card>
+
+      <ion-card-header>
+
+        <ion-card-title>Personal Information</ion-card-title>
+
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <div formArrayName="responses">
+
+          <div *ngFor="let question of questions.slice(0, 10); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i" (change)="onSelectChange($event, question.concept)">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <input type="date" [formControlName]="i" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Geographical Data</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(10, 16); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 10" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 10" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 11" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 10" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Dreams Data</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(16, 21); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 16" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 16" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 16" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 16" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Interoperability</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(21, 25); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 21" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 21" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 21" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 21" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Individual and Household</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(25, 31); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 25" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 25" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 25" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 25" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+            <div *ngIf="question.type === 'radio'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <label>
+                  <input type="radio" [formControlName]="(i + 25).toString()" [value]="option.value" />
+                  {{ option.label }}
+                </label>
+              </div>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Household</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(31, 41); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 31" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 31" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 31" class="form-control"></textarea>
+            </div>
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 31" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Education and Employment</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(41, 47); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 41" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 41" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 41" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i+ 46" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>HIV Testing</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(47, 50); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 47" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 47" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 47" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i + 47" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Sexual Activity</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(50,59); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 50" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 50" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 50" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i + 50" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Reproductive Health</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(59,62); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 59" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 59" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 59" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i + 59" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>GBV</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(61,78); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 61" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 61" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 61" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i + 61" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Drug Use</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(78, 81); let i = index">
+            <div *ngIf="!question.hide" class="question-container">
+
+              <div *ngIf="question.type === 'dropdown'">
+                <label>{{ question.label }}</label>
+                <select [formControlName]="i + 78" (change)="onSelectChange($event, question.concept)">
+                  <option *ngFor="let option of question.options" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div *ngIf="question.type === 'text'">
+                <label>{{ question.label }}</label>
+                <input type="text" [formControlName]="i + 78" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'textarea'">
+                <label>{{ question.label }}</label>
+                <textarea [formControlName]="i + 78" class="form-control"></textarea>
+              </div>
+              <div *ngIf="question.type === 'number'">
+                <label>{{ question.label }}</label>
+                <input type="number" [formControlName]="i + 78" class="form-control" />
+              </div>
+
+              <div *ngIf="question.type === 'checkbox'">
+                <label>{{ question.label }}</label>
+                <div *ngFor="let option of question.options">
+                  <input type="checkbox" [value]="option.value"
+                    (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                  <label>{{ option.label }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="!question.type">
+                <p>Unsupported question type</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Programmes</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(81); let i = index" class="question-container">
+            <!-- Dropdown -->
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i + 81" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Text Input -->
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i + 81" class="form-control" />
+            </div>
+
+            <!-- Textarea -->
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i + 81" class="form-control"></textarea>
+            </div>
+
+            <!-- Number Input -->
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <input type="number" [formControlName]="i + 81" class="form-control" />
+            </div>
+
+            <!-- Checkboxes -->
+            <div *ngIf="question.type === 'checkbox'">
+              <label>{{ question.label }}</label>
+              <div *ngFor="let option of question.options">
+                <input type="checkbox" [value]="option.value"
+                  (change)="onCheckboxChange($event, question.concept, option.value)" class="form-check-input" />
+                <label>{{ option.label }}</label>
+              </div>
+            </div>
+
+            <!-- Unsupported Question Type -->
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <button type="submit" [disabled]="enrollmentForm.invalid" class="btn btn-primary mt-3">
+      Submit
+    </button>
+
+  </form>
+
+</ion-content>

@@ -1,0 +1,70 @@
+ion-content {
+  --background: #ffffff;
+}
+
+/* Style for the IonCard */
+.program-card {
+  margin: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: white; /* Ensure the card itself is light */
+}
+
+/* Table Styling */
+.program-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  background-color: white; /* Set the background to white */
+}
+
+.program-table th, .program-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+  word-wrap: break-word;
+  color: #333; /* Set a light text color (dark gray) */
+}
+
+.program-table th {
+  background-color: #f4f4f4; /* Light gray background for table headers */
+  font-weight: bold;
+}
+
+.program-table td {
+  background-color: #fff; /* Ensure cells have white background */
+}
+
+.program-table tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray background for even rows */
+}
+
+/* Hover effect on rows */
+.program-table tr:hover {
+  background-color: #eaeaea; /* Light gray hover effect */
+}
+
+@media (max-width: 768px) {
+  .program-table th, .program-table td {
+    padding: 8px;
+  }
+
+  .program-table th {
+    font-size: 14px;
+  }
+
+  .program-table td {
+    font-size: 12px;
+  }
+}
+
+.custom-profileHeaders {
+  position: relative;
+  // display: flex;
+  text-align: center;
+  color: #ffffff;
+  font-size:20px;
+  left: -25px;
+}
+
+
+

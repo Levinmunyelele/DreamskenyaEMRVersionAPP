@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Role Management</ion-title>
+  </ion-toolbar>
+  
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title style="color: black; background-color: white; padding: 5px;">Roles</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <!-- Add Role Button -->
+      <ion-button expand="block" color="primary" (click)="addRole()">Add Role</ion-button>
+
+      <!-- Roles List -->
+      <ion-list>
+        <ion-item *ngFor="let role of roles">
+          <ion-label>
+            <p>{{ role.display }}</p>
+          </ion-label>
+          <ion-button (click)="editRole(role)" fill="solid" color="primary" size="small">
+            Edit
+          </ion-button>
+          <ion-button (click)="deleteRole(role.uuid)" fill="outline" color="danger" size="small">
+            Delete
+          </ion-button>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,156 @@
+/* General Form Styling */
+form {
+  ion-card {
+    margin: 10px 0;
+    padding: 10px;
+
+    ion-card-header {
+      background-color: #f0f4f8;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    ion-card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    ion-card-content {
+      padding: 10px 0;
+
+      ion-item {
+        padding: 8px 0;
+
+        .label {
+          font-size: 1rem;
+          color: #333;
+        }
+
+        .input {
+          background-color: #f9f9f9;
+          border-radius: 5px;
+          padding: 10px;
+        }
+      }
+
+      ion-select {
+        width: 100%;
+
+        .select-icon {
+          color: #4f8ef7;
+        }
+      }
+
+      ion-input {
+        background-color: #f9f9f9;
+        border-radius: 5px;
+      }
+    }
+  }
+
+  /* Disable submit button when form is invalid */
+  ion-button[disabled] {
+    background-color: #d0d0d0;
+    color: #888;
+  }
+
+  /* Margin for submit button */
+  ion-button {
+    margin-top: 20px;
+    background-color: var(--ion-color-primary);
+    border-radius: 5px;
+  }
+
+  /* Card Header Text */
+  .card-header-text {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+  }
+
+  /* Input Styling */
+  ion-input,
+  ion-select {
+    font-size: 1rem;
+  }
+
+  /* Spacing between ion-items */
+  ion-item {
+    margin-bottom: 15px;
+    --inner-padding-top: 10px;
+    --inner-padding-bottom: 10px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+
+  /* Adjust the font size of ion-labels */
+  ion-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--ion-text-color);
+    margin-bottom: 8px;
+  }
+
+  /* Adjust for fullscreen view */
+  ion-content[fullscreen] {
+    padding: 15px;
+  }
+}
+
+/* Specific styling for form controls inside cards */
+ion-card-header {
+  background-color: #0076ff;
+  color: white;
+}
+
+ion-card-content {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+ion-item {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+input,
+ion-input {
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #fafafa;
+}
+
+/* Style the labels */
+ion-label {
+  font-size: 1rem;
+  color: #333;
+}
+
+input,
+ion-input {
+  font-size: 1rem;
+  color: #333;
+  padding: 8px 10px;
+  background: #f7f7f7;
+}
+
+ion-input, ion-select {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  margin-top: 5px; /* Optional: Adds a slight margin on top of the input for extra space */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  ion-card {
+    margin: 5px;
+  }
+
+  ion-button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
