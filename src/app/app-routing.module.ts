@@ -48,9 +48,9 @@ const routes: Routes = [
     loadChildren: () => import('./enrollment/enrollment.module').then( m => m.EnrollmentPageModule)
   },
   {
-    path: 'vulnerability-screening',
-    loadChildren: () => import('./vulnerability-screening/vulnerability-screening.module').then( m => m.VulnerabilityScreeningPageModule)
-  },
+    path: 'vulnerability-screening/:patientUuid/:idPart/:cleanName',
+    loadChildren: () => import('./vulnerability-screening/vulnerability-screening.module').then(m => m.VulnerabilityScreeningPageModule)
+  },    
   {
     path: 'screened-agwy',
     loadChildren: () => import('./screened-agwy/screened-agwy.module').then( m => m.ScreenedAGWYPageModule)
@@ -62,6 +62,10 @@ const routes: Routes = [
   {
     path: 'registration',
     loadChildren: () => import('./registration/registration.module').then( m => m.RegistrationPageModule)
+  },
+  {
+    path: 'visit/:patientUuid',
+    loadChildren: () => import('./visit/visit.module').then( m => m.VisitPageModule)
   },
   
 ];

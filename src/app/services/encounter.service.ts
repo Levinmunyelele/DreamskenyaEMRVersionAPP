@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +23,15 @@ export class EncounterService {
   submitPatient(payload: any): Observable<any> {
     return this.apiService.post('patient', payload);
   }
-
-  searchPatients(query: string): Observable<any> {  
-    return this.apiService.get(`patient?q=${query}&v=default&limit=1`); 
+  checkIfPatientHasActiveVisit(patientUuid: string): Observable<boolean> {
+    return this.apiService.get(`visit?patient=${patientUuid}&includeInactive=false`).pipe(
+      map((response: { results: any[] }) => response.results.length > 0)
+    );
   }
   
-  
+
+  searchPatients(query: string): Observable<any> {  
+    return this.apiService.get(`patient?q=${query}&v=full`);
+  }  
   
 }

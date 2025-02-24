@@ -2,6 +2,11 @@ import { RoleService } from './../services/role.service';
 import { Component, OnInit } from '@angular/core';
 import { EncounterService } from '../services/encounter.service';
 import { NavController } from '@ionic/angular'; 
+import { VisitService } from '../services/visit.service';
+import { ModalController } from '@ionic/angular';
+import { VisitPage } from '../visit/visit.page';
+import { LocationService } from '../services/location.service';  
+
 
 @Component({
   selector: 'app-home',
@@ -18,17 +23,29 @@ export class HomePage implements OnInit {
   currentDate: string = '';
   patientSearchResults: any[] = []; 
   patientQuery: string = '';
+  noResults!: boolean;
+  loading!: boolean;
+  visits: any[] = [];
+  selectedLocationId: string = ''; 
+  locations: any[] = [];
+  hideSearchButton!: boolean;
 
   constructor(
     private roleService: RoleService,
     private encounterService: EncounterService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private visit: VisitService,
+    private modalCtrl: ModalController,
+    private locationService: LocationService 
     ) {}
 
   ngOnInit() {
     this.setGreeting();
     this.setDate();
     this.getWeatherByLocation();
+    this.loadVisits();
+    this.loadLocations(); 
+
   }
 
   setGreeting() {
@@ -82,19 +99,110 @@ export class HomePage implements OnInit {
     }
   }
 
-  searchPatients(query: string) {
-    this.encounterService.searchPatients(query).subscribe(
-      (results) => {
-        this.patientSearchResults = results.results;  
-        console.log('Search results:', this.patientSearchResults);
+  loadLocations() {
+    this.locationService.getLocations().subscribe({
+      next: (response) => {
+        this.locations = response.results; 
+        if (this.locations.length > 0) {
+          this.selectedLocationId = this.locations[0].uuid; 
+          this.loadVisits(); 
+        }
+        console.log('Locations:', this.locations);
+
       },
-      (error) => {
-        console.error('Error searching patients:', error);
+      error: (error) => {
+        console.error('Error loading locations:', error);
       }
-    );
+    });
   }
 
-  goToScreeningPage(uuid: string, name: string) {
-    this.navCtrl.navigateForward(`/vulnerability-screening/${uuid}/${name}`); 
+  searchPatients(query: string) {
+    this.loading = true;
+
+    setTimeout(() => {
+      this.encounterService.searchPatients(query).subscribe(
+        (results) => {
+          if (results.results.length === 0) {
+            this.patientSearchResults = [];
+            this.noResults = true;
+            this.loading = false;
+            return;
+          }
+
+          this.patientSearchResults = results.results;
+          console.log('Search results:', this.patientSearchResults);
+
+          this.patientSearchResults.forEach((patient, index) => {
+            this.encounterService.checkIfPatientHasActiveVisit(patient.uuid).subscribe((hasActiveVisit: boolean) => {
+              this.patientSearchResults[index].hasActiveVisit = hasActiveVisit;
+            });
+          });
+
+          this.noResults = false;
+          this.loading = false;
+        },
+        (error) => {
+          console.error('Error searching patients:', error);
+          this.loading = false;
+        }
+      );
+    });
   }
+  
+  
+  goToRegistration() {
+    this.navCtrl.navigateForward(['/registration']);  
+  }
+  
+
+  goToScreeningPage(patientUuid: string, name: string) {
+    const idPart = name.split(' - ')[0]; 
+    const cleanName = name.split(' - ')[1] || name; 
+  
+    console.log('ID Part:', idPart);  
+    console.log('Name:', cleanName);  
+    console.log('Patient UUID:', patientUuid); 
+  
+    this.navCtrl.navigateForward(`/vulnerability-screening/${patientUuid}/${idPart}/${cleanName}`);
+  }
+
+  
+  onLocationChange(event: any) {
+    this.selectedLocationId = event.detail.value;
+    this.loadVisits(); // Reload visits for the new location
+  }
+
+  loadVisits() {
+    if (!this.selectedLocationId) return; // Ensure a location is selected
+    this.visit.getVisits(this.selectedLocationId).subscribe({
+      next: (data) => {
+        this.visits = data.results; // Assuming API returns { results: [...] }
+        console.log('Visits:', this.visits);
+      },
+      error: (error) => {
+        console.error('Error loading visits:', error);
+        this.visits = []; // Ensure visits is empty if there's an error
+      }
+    });
+  }
+  
+
+  async checkIn(patientUuid: string, name: string) {
+    const cleanName = name.split(' - ')[1] || name; // Process name
+  
+    const modal = await this.modalCtrl.create({
+      component: VisitPage, // Load VisitPage in the modal
+      componentProps: { 
+        patientUuid, 
+        patientName: cleanName // Pass both values
+      }, 
+      breakpoints: [0, 0.5, 1], // Allows modal to be minimized, half-screen, or full
+      initialBreakpoint: 0.5, // Opens in half-screen mode
+    });
+  
+    await modal.present();
+  }
+  
+  
+  
 }

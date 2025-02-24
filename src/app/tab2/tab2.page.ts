@@ -16,33 +16,33 @@ export class Tab2Page implements OnInit {
 
   ngOnInit() {
     // Call the function to fetch visits when the component is initialized
-    this.getVisits();
+    // this.getVisits();
   }
 
   // Method to fetch visits
-  getVisits() {
-    this.loading = true;  // Set loading to true when API call starts
+  // getVisits() {
+  //   this.loading = true;  // Set loading to true when API call starts
     
-    const params = {
-      v: 'custom:(patient:(uuid,identifiers:(identifier,uuid,identifierType:(name,uuid)),person:(age,display,gender,uuid,attributes:(value,attributeType:(uuid,display)))),visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime)',
-      includeInactive: 'false',
-      totalCount: 'true',
-      location: 'c149692f-fb6f-4f5c-822c-144e52ef50f8'
-    };
+  //   const params = {
+  //     v: 'custom:(patient:(uuid,identifiers:(identifier,uuid,identifierType:(name,uuid)),person:(age,display,gender,uuid,attributes:(value,attributeType:(uuid,display)))),visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime)',
+  //     includeInactive: 'false',
+  //     totalCount: 'true',
+  //     location: 'c149692f-fb6f-4f5c-822c-144e52ef50f8'
+  //   };
 
-    // Call the visit service to fetch data
-    this.visitService.getVisits(params).subscribe(
-      (response) => {
-        console.log('Visits:', response);
-        // Assuming response contains a 'results' property, set visits to that array
-        this.visits = response.results || [];  // Store the response in the visits array
-        this.loading = false;  // Set loading to false after the data is received
-      },
-      (error) => {
-        console.error('Error fetching visits:', error);
-        this.errorMessage = 'Error fetching visit data';  // Display an error message if the API call fails
-        this.loading = false;  // Set loading to false even if there is an error
-      }
-    );
-  }
+  //   // Call the visit service to fetch data
+  //   this.visitService.getVisits(params).subscribe(
+  //     (response) => {
+  //       console.log('Visits:', response);
+  //       // Assuming response contains a 'results' property, set visits to that array
+  //       this.visits = response.results || [];  // Store the response in the visits array
+  //       this.loading = false;  // Set loading to false after the data is received
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching visits:', error);
+  //       this.errorMessage = 'Error fetching visit data';  // Display an error message if the API call fails
+  //       this.loading = false;  // Set loading to false even if there is an error
+  //     }
+  //   );
+  // }
 }

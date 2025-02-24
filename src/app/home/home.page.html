@@ -9,40 +9,105 @@
     <ion-card-content>
       <h1 class="greeting-title">{{ greeting }}</h1>
       <p class="date">📅 {{ currentDate }}</p>
-      <p *ngIf="locationError" class="error">{{ locationError }}</p>
     </ion-card-content>
   </ion-card>
   <ion-card class="search-card">
     <ion-card-header>
-      <ion-card-title>Search for Patient</ion-card-title>
+      <ion-card-title class="search">Search for Patient</ion-card-title>
     </ion-card-header>
     
-    <ion-card-content>
+    <ion-card-content class="patient">
       <ion-item>
-        <ion-label position="floating">Enter Patient Name</ion-label>
+        <ion-label position="floating">Enter Patient Name or ID</ion-label>
         <ion-input [(ngModel)]="patientQuery" placeholder=""></ion-input>
       </ion-item>
-
-      <ion-button expand="full" color="primary" (click)="searchPatients(patientQuery)" class="search-button">
+      <ion-button *ngIf="!loading" expand="full" color="primary" (click)="searchPatients(patientQuery)" class="search-button">
         Search
       </ion-button>
-
+      <ion-spinner *ngIf="loading" name="crescent" class="spinner"></ion-spinner>
+      
       <ion-list class="patient-list">
         <ion-item *ngFor="let patient of patientSearchResults">
           <ion-label>
             <h2>{{ patient.display }}</h2> 
             <p>{{ patient.uuid }}</p> 
           </ion-label>
-          <ion-button 
-          color="secondary" 
-          (click)="goToScreeningPage(patient.uuid, patient.display)" 
-          slot="end">
-          Go to Screening
-        </ion-button>
+         <ion-button 
+  (click)="checkIn(patient.uuid, patient.display)" 
+  slot="end"
+  [disabled]="patient.hasActiveVisit">
+  Check In
+</ion-button>
+
         </ion-item>
       </ion-list>
+      <p *ngIf="noResults" class="no-results-message">No results match.</p>
+      <ion-button *ngIf="noResults" expand="full"(click)="goToRegistration()">Go to Registration</ion-button>
     </ion-card-content>
   </ion-card>
+
+
+  <ion-card *ngIf="visits.length > 0; else noVisits" class="search-card">
+    <ion-card-header>
+      <ion-card-title class="search">Active Visits</ion-card-title>
+    </ion-card-header>
+    <ion-item>
+      <ion-label>Filter by Location</ion-label>
+      <ion-select [(ngModel)]="selectedLocationId" (ionChange)="onLocationChange($event)">
+        <ion-select-option *ngFor="let location of locations" [value]="location.uuid">
+          {{ location.name }}
+        </ion-select-option>
+      </ion-select>      
+    </ion-item>
+    <ion-card-content>
+      <div class="table-container">
+        <table class="visit-table">
+          <thead>
+            <tr>
+              <th>Visit Time</th>
+              <th>Patient Name</th>
+              <th>Patient ID</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Visit Type</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let visit of visits">
+              <td>{{ visit.startDatetime | date:'short' }}</td>
+              <td>{{ visit.patient.person.display }}</td>
+              <td>{{ visit.patient.identifiers[0]?.identifier || 'N/A' }}</td>
+              <td>{{ visit.patient.person.age }}</td>
+              <td>{{ visit.patient.person.gender }}</td>
+              <td>{{ visit.visitType.display }}</td>
+              <td>{{ visit.stopDatetime ? (visit.stopDatetime | date:'short') : 'Ongoing' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  
+ <ng-template #noVisits>
+    <ion-card class="search-card">
+      <ion-card-header>
+        <ion-card-title class="search">Active Visits</ion-card-title>
+      </ion-card-header>
+      <ion-item>
+        <ion-label>Filter by Location</ion-label>
+        <ion-select [(ngModel)]="selectedLocationId" (ionChange)="onLocationChange($event)">
+          <ion-select-option *ngFor="let location of locations" [value]="location.uuid">
+            {{ location.name }}
+          </ion-select-option>
+        </ion-select>      
+      </ion-item>
+      <ion-card-content>
+        <p class="no-visits-message">No active visits for this location.</p>
+      </ion-card-content>
+    </ion-card>
+  </ng-template>
+  
 
   <!-- <ion-card class="home-card">
     <ion-card-header>

@@ -16,4 +16,8 @@ export class LocationService {
   getLocations(params?: any): Observable<any> {
     return this.apiService.get('location', params);  
   }
+
+  getVisitationTypes(params?: any): Observable<any> {
+    return this.apiService.get('visittype', params);  
+  }
 }

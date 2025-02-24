@@ -1,0 +1,92 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Starting a visit for <strong>{{ patientName }}</strong></ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="visitForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Visit start date and time</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <!-- Date Input -->
+            <ion-col size="5">
+              <ion-label position="stacked">Date</ion-label>
+              <ion-input type="date" formControlName="visitDate"></ion-input>
+            </ion-col>
+
+            <!-- Time Input -->
+            <ion-col size="5">
+              <ion-label position="stacked">Time</ion-label>
+              <ion-input type="time" formControlName="visitTime"></ion-input>
+            </ion-col>
+
+            <!-- AM/PM Dropdown -->
+            <ion-col size="2">
+              <ion-select formControlName="meridian">
+                <ion-select-option value="AM">AM</ion-select-option>
+                <ion-select-option value="PM">PM</ion-select-option>
+              </ion-select>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Basic Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngFor="let question of questions">
+          <div class="question-container">
+            <!-- Dropdown -->
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <ion-select formControlName="{{ question.key }}">
+                <ion-select-option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+
+            <!-- Text Input -->
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <ion-input type="text" formControlName="{{ question.key }}"></ion-input>
+            </div>
+
+            <!-- Number Input -->
+            <div *ngIf="question.type === 'number'">
+              <label>{{ question.label }}</label>
+              <ion-input type="number" formControlName="{{ question.key }}"></ion-input>
+            </div>
+
+            <!-- Radio Button -->
+            <div *ngIf="question.type === 'radio'">
+              <label>{{ question.label }}</label>
+              <ion-radio-group formControlName="{{ question.key }}">
+                <ion-item *ngFor="let option of question.options">
+                  <ion-label>{{ option.label }}</ion-label>
+                  <ion-radio [value]="option.value"></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button type="button" expand="full" [disabled]="visitForm.invalid" (click)="submitVisit()">
+     Check In
+    </ion-button>
+    
+  </form>
+</ion-content>
