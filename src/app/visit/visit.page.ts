@@ -205,7 +205,7 @@ export class VisitPage implements OnInit {
     
         if (!patientUuid || !idPart || !patientName) {
           console.error('Missing required data:', response);
-          return; // Prevent navigation if any data is missing
+          return; 
         }
     
         // Encode patient name for URL safety
@@ -223,10 +223,8 @@ export class VisitPage implements OnInit {
               handler: async () => {
                 console.log(`Navigating to: /vulnerability-screening/${patientUuid}/${idPart}/${cleanName}`);
                 
-                // 🛑 Close the modal before navigation
                 await this.modalCtrl.dismiss();
                 
-                // 🚀 Now navigate
                 this.router.navigate([`/vulnerability-screening`, patientUuid, idPart, cleanName]);
               }
             }

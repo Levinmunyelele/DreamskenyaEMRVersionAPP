@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Patient Summary</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Patient Information Card -->
+  <ion-card class="profile-container">
+    <!-- Avatar -->
+    <div class="avatar">
+      <span>{{ getInitials(patientName) }}</span>
+    </div>
+
+    <!-- Patient Details -->
+    <div class="patient-info">
+      <h2>{{ patientName }}</h2>
+      <h6>{{ patientAge }} Years</h6>
+      <p>ID: {{ patientId }}</p>
+
+      <!-- Visit Status -->
+      <div class="visit-status" >
+        Active Visit
+      </div>
+    </div>
+  </ion-card>
+
+  <ion-grid>
+    <ion-row>
+      <!-- Conditions Card -->
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Conditions</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngIf="conditions.length === 0">
+                <ion-label>No conditions recorded</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let cond of conditions">
+                <ion-label>{{ cond.code?.text || 'Unknown Condition' }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Allergies Card -->
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Allergies</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngIf="allergies.length === 0">
+                <ion-label>No allergies recorded</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let allergy of allergies">
+                <ion-label>{{ allergy.code?.text || 'Unknown Allergy' }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <!-- Immunizations Card -->
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Immunizations</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngIf="immunizations.length === 0">
+                <ion-label>No immunizations recorded</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let imm of immunizations">
+                <ion-label>{{ imm.vaccineCode?.text || 'Unknown Immunization' }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Medications Card -->
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Medications</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngIf="medications.length === 0">
+                <ion-label>No active medications recorded</ion-label>
+              </ion-item>
+              <ion-item *ngFor="let med of medications">
+                <ion-label>{{ med.medicationCodeableConcept?.text || 'Unknown Medication' }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

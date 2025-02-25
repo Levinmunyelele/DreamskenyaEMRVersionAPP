@@ -32,9 +32,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let data of screeningDataList">
-          <td>{{ data.patient?.uuid || 'N/A' }}</td>
-          <td>{{ getProviderName(data.provider?.uuid || '') }}</td>
-          <td>{{ getLocationName(data.location?.uuid || '') }}</td>
+          <td>{{ data.patient.uuid || 'N/A' }}</td>
+          <td>{{ getProviderName(data.provider.uuid || '') }}</td>
+          <td>{{ getLocationName(data.location.uuid || '') }}</td>
           <td>{{ getEligibility(data.obs) }}</td>
         </tr>
       </tbody>

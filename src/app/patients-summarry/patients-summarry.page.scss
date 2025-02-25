@@ -1,0 +1,133 @@
+/* Overall content styling */
+ion-content {
+    --background: #f5f5f5; /* Light gray background */
+    padding: 16px;
+  }
+  
+  /* Patient info card */
+  ion-card:first-of-type {
+    margin-bottom: 24px; /* More space below the patient info card */
+    --background: #ffffff;
+    --border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Grid and row styling */
+  ion-grid {
+    /* Optional: add a border around the grid if desired */
+    /* border: 1px solid #ddd; */
+  }
+  
+  ion-row {
+    margin-bottom: 16px; /* space between rows */
+  }
+  
+  /* Column/card styling for each section */
+  ion-col {
+    padding: 0 8px; /* horizontal padding between cards */
+  }
+  
+  ion-card {
+    --background: #ffffff;
+    --border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 8px 0;
+  }
+  
+  /* Card header and title styling */
+  ion-card-header {
+    background-color: #fafafa;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  ion-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Card content styling */
+  ion-card-content {
+    padding: 12px;
+  }
+  
+  /* List styling within cards */
+  ion-list {
+    margin: 0;
+    padding: 0;
+  }
+  
+  ion-item {
+    --min-height: 40px;
+    padding: 4px 0;
+  }
+  
+  ion-item-divider {
+    --background: #e0e0e0;
+    font-weight: bold;
+    padding: 6px 12px;
+  }
+  .profile-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1d434e; /* Preferred color */
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+  
+  .patient-info {
+    flex-grow: 1;
+  }
+  
+  .patient-info h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  .patient-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .visit-status {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px; /* Rounded rectangle */
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 100px; /* Ensures a rectangular look */
+    background-color: #28a745; /* Green color */
+    color: white;
+  }
+  
+  
+  .visit-status.active {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .visit-status.inactive {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  

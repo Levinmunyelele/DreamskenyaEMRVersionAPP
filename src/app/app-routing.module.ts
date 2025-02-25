@@ -67,6 +67,10 @@ const routes: Routes = [
     path: 'visit/:patientUuid',
     loadChildren: () => import('./visit/visit.module').then( m => m.VisitPageModule)
   },
+  {
+    path: 'patient-summary/:uuid/:id/:age/:name',
+    loadChildren: () => import('./patients-summarry/patients-summarry.module').then( m => m.PatientsSummarryPageModule)
+  },
   
 ];
 

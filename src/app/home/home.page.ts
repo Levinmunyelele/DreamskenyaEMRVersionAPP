@@ -154,8 +154,28 @@ export class HomePage implements OnInit {
     this.navCtrl.navigateForward(['/registration']);  
   }
   
-
-  goToScreeningPage(patientUuid: string, name: string) {
+  goToPatientSummary(patient: any): void {
+    if (!patient || !patient.uuid || !patient.person) {
+      console.error("Invalid patient data:", patient);
+      return;
+    }
+  
+    const uuid = patient.uuid;
+    const name = patient.person.display || "Unknown";
+    const age = patient.person.age 
+    
+    // Extract the identifier (ID)
+    let idPart = "N/A"; 
+    if (patient.identifiers && patient.identifiers.length > 0) {
+      idPart = patient.identifiers[0].identifier; 
+    }
+  
+    this.navCtrl.navigateForward(`/patient-summary/${uuid}/${idPart}/${age}/${encodeURIComponent(name)}`);
+  }
+  
+  
+  
+  goToScreeningPage(patientUuid: string, name: string): void {
     const idPart = name.split(' - ')[0]; 
     const cleanName = name.split(' - ')[1] || name; 
   
@@ -165,7 +185,6 @@ export class HomePage implements OnInit {
   
     this.navCtrl.navigateForward(`/vulnerability-screening/${patientUuid}/${idPart}/${cleanName}`);
   }
-
   
   onLocationChange(event: any) {
     this.selectedLocationId = event.detail.value;

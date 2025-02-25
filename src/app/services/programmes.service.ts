@@ -17,7 +17,7 @@ export class ProgrammesService {
     const headers = new HttpHeaders().set('Authorization', authHeader);
   
     // Make the API call to the session endpoint
-    return this.api.get('session', {}, { headers, withCredentials: true }).pipe(
+    return this.api.get('session', {}, false, { headers, withCredentials: true }).pipe(
       tap((response) => {
         console.log('Login response:', response);  // Log the entire response for debugging
   

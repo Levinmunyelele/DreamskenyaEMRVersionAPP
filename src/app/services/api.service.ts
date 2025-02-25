@@ -6,37 +6,30 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  url = 'http://localhost:8080/openmrs/ws/rest/v1/';
+  private url = 'http://localhost:8080/openmrs/ws/rest/v1/';
+  private url2 = 'http://localhost:8080/openmrs/ws/fhir2/R4/';
 
   constructor(private http: HttpClient) {}
 
-  getAuthHeaders(): HttpHeaders {
-    let headers = new HttpHeaders().set('Content-Type', 'application/json');
-    const sessionId = sessionStorage.getItem('JSESSIONID');
-    if (sessionId) {
-      headers = headers.set('Authorization', `Basic ${sessionId}`);
-    } else {
-    }
-    return headers;
-  }    
-
-  setSessionId(sessionId: string): void {
-    sessionStorage.setItem('JSESSIONID', sessionId);
-    console.log('Session ID set:', sessionId); 
-  }
-
   private createAuthorizationHeader(): HttpHeaders {
-    const headers = new HttpHeaders({
-      'Authorization': 'Basic ' + btoa('admin:Admin123')
+    return new HttpHeaders({
+      'Authorization': 'Basic ' + btoa('admin:Admin123'),
+      'Content-Type': 'application/json'
     });
-    return headers;
   }
 
-  get(endpoint: string, params?: any, reqOpts?: any): Observable<any> {
-    if (!reqOpts) {
-      reqOpts = { params: new HttpParams() };
-    }
+  private getBaseUrl(useFhir: boolean): string {
+    return useFhir ? this.url2 : this.url;
+  }
 
+  get(endpoint: string, params?: any, useFhir: boolean = false, httpOptions: any = {}): Observable<any> {
+    let reqOpts: any = { 
+      params: new HttpParams(),
+      headers: this.createAuthorizationHeader(),
+      withCredentials: true,
+      ...httpOptions  // Merge custom options
+    };
+  
     if (params) {
       for (const k in params) {
         if (params.hasOwnProperty(k)) {
@@ -44,49 +37,29 @@ export class ApiService {
         }
       }
     }
-
-    reqOpts.headers = this.createAuthorizationHeader();  
-    reqOpts.withCredentials = true;  
-    console.log('GET Request Options:', reqOpts); // Log the request options
-    return this.http.get(this.url + endpoint, reqOpts);
+  
+    console.log('GET Request to:', this.getBaseUrl(useFhir) + endpoint, reqOpts);
+    return this.http.get(this.getBaseUrl(useFhir) + endpoint, reqOpts);
   }
+  
 
-  post(endpoint: string, body: any): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-    console.log('POST Headers:', headers); // Log the headers
-    return this.http.post(this.url + endpoint, JSON.stringify(body), {
-      headers,
-      withCredentials: true  
-    });
-  }
-
- 
-  put(endpoint: string, body: any): Observable<any> {
+  post(endpoint: string, body: any, useFhir: boolean = false): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    console.log('PUT Headers:', headers); // Log the headers
-    return this.http.put(this.url + endpoint, JSON.stringify(body), {
-      headers,
-      withCredentials: true  
-    });
+    return this.http.post(this.getBaseUrl(useFhir) + endpoint, JSON.stringify(body), { headers, withCredentials: true });
   }
 
- 
-  delete(endpoint: string, reqOpts?: any): Observable<any> {
+  put(endpoint: string, body: any, useFhir: boolean = false): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    reqOpts = { headers, withCredentials: true };  
-    console.log('DELETE Request Options:', reqOpts); // Log the request options
-    return this.http.delete(this.url + endpoint, reqOpts);
+    return this.http.put(this.getBaseUrl(useFhir) + endpoint, JSON.stringify(body), { headers, withCredentials: true });
   }
 
-  // PATCH request
-  patch(endpoint: string, body: any, reqOpts?: any): Observable<any> {
+  delete(endpoint: string, useFhir: boolean = false): Observable<any> {
     const headers = this.createAuthorizationHeader();
-    console.log('PATCH Headers:', headers); // Log the headers
-    return this.http.patch(this.url + endpoint, JSON.stringify(body), {
-      headers,
-      withCredentials: true  
-    });
+    return this.http.delete(this.getBaseUrl(useFhir) + endpoint, { headers, withCredentials: true });
+  }
+
+  patch(endpoint: string, body: any, useFhir: boolean = false): Observable<any> {
+    const headers = this.createAuthorizationHeader();
+    return this.http.patch(this.getBaseUrl(useFhir) + endpoint, JSON.stringify(body), { headers, withCredentials: true });
   }
 }
