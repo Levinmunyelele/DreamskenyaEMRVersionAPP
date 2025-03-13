@@ -56,7 +56,7 @@ const routes: Routes = [
     loadChildren: () => import('./screened-agwy/screened-agwy.module').then( m => m.ScreenedAGWYPageModule)
   },
   {
-    path: 'service-uptake',
+    path: 'service-uptake1',
     loadChildren: () => import('./service-uptake/service-uptake.module').then( m => m.ServiceUptakePageModule)
   },
   {
@@ -64,15 +64,31 @@ const routes: Routes = [
     loadChildren: () => import('./registration/registration.module').then( m => m.RegistrationPageModule)
   },
   {
-    path: 'visit/:patientUuid',
+    path: 'visit/:patientUuid/:idPart/:cleanName',
     loadChildren: () => import('./visit/visit.module').then( m => m.VisitPageModule)
   },
-  {
-    path: 'patient-summary/:uuid/:id/:age/:name',
-    loadChildren: () => import('./patients-summarry/patients-summarry.module').then( m => m.PatientsSummarryPageModule)
-  },
   
-];
+  {
+    path: 'patients/:uuid/:id/:age/:name',
+    loadChildren: () => import('./patients/patients.module').then( m => m.PatientsPageModule)
+  },
+  {
+    path: 'service-uptake',
+    loadChildren: () => import('./service-profile/service-uptake/service-uptake.module').then( m => m.ServiceUptakePageModule)
+  },
+  {
+    path:'behavioural',
+    loadChildren: () => import('./service-profile/service-uptake/pages/behavioural/behavioural.module').then( m => m.BehaviouralPageModule)
+  },
+  {
+    path:'bio-medical',
+    loadChildren: () => import('./service-profile/service-uptake/pages/bio-medical/bio-medical.module').then( m => m.BioMedicalPageModule)
+  }, 
+  {
+    path:'post-violence',
+    loadChildren: () => import('./service-profile/service-uptake/pages/post-violence/post-violence.module').then( m => m.PostViolencePageModule)
+  },
+]
 
 @NgModule({
   imports: [

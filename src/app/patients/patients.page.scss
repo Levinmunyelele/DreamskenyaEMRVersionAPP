@@ -1,0 +1,67 @@
+ion-list {
+    padding: 10px;
+  }
+  
+  ion-item {
+    --border-radius: 10px;
+    margin: 5px;
+    --background: white;
+    --box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1d434e; /* Preferred color */
+    color: white;
+    font-weight: bold;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+  
+  .patient-info {
+    flex-grow: 1;
+  }
+  
+  .patient-info h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  .patient-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .visit-status {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px; /* Rounded rectangle */
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 100px; /* Ensures a rectangular look */
+    background-color: #28a745; /* Green color */
+    color: white;
+  }
+  
+  
+  .visit-status.active {
+    background-color: #28a745;
+    color: white;
+  }
+  

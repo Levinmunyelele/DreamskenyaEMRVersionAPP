@@ -261,7 +261,7 @@ export class RegistrationPage implements OnInit {
                 message: 'Patient registered successfully!',
                 buttons: [
                   {
-                    text: 'Check In Patient',
+                    text: 'Would you like to proceed to screening?',
                     handler: () => {
                       // Split the patient name by ' - ' to get the ID part and the full name
                       const parts = patientName.split(' - ');  // Split by ' - '

@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { VisitService } from '../../services/visit.service';
 import { ActivatedRoute } from '@angular/router';
-import { VisitService } from '../services/visit.service';
+
+
 
 @Component({
-  selector: 'app-patients-summarry',
-  templateUrl: './patients-summarry.page.html',
-  styleUrls: ['./patients-summarry.page.scss'],
+  selector: 'app-patients-summary',
+  templateUrl: './patients-summary.component.html',
+  styleUrls: ['./patients-summary.component.scss'],
 })
-export class PatientsSummarryPage implements OnInit {
+export class PatientsSummaryComponent  implements OnInit {
+
   patientUuid!: string;
   patientId!: string;
   patientName!: string;
@@ -18,12 +21,13 @@ export class PatientsSummarryPage implements OnInit {
   patientAge!: string;
 
   constructor(
+    private visitService: VisitService,
     private route: ActivatedRoute,
-    private visitService: VisitService
-  ) {}
 
-  ngOnInit(): void {
-    // Subscribe to route parameters
+
+  ) { }
+
+  ngOnInit() {
     this.route.paramMap.subscribe(params => {
       this.patientUuid = params.get('uuid')!;
       this.patientId = params.get('id')!;
@@ -36,16 +40,7 @@ export class PatientsSummarryPage implements OnInit {
 
       // Load patient data after parameters are set
       this.loadPatientSummaryData();
-    });
-  }
-
-  getInitials(name: string): string {
-    if (!name) return 'NA';
-    const parts = name.split(' ');
-    const initials = parts.map(part => part.charAt(0)).join('').toUpperCase();
-    return initials.length > 2 ? initials.substring(0, 2) : initials;
-  }
-  
+    });  }
 
   loadPatientSummaryData(): void {
     // Fetch Conditions
@@ -88,4 +83,5 @@ export class PatientsSummarryPage implements OnInit {
       }
     });
   }
+
 }

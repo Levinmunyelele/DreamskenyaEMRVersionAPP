@@ -1,14 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
-import { FormService } from '../services/form.service';
+import { ActivatedRoute, Router } from '@angular/router'
+import { DatePipe } from '@angular/common';
+import { AlertController } from '@ionic/angular';
+import { map, switchMap } from 'rxjs/operators';
+
+
+
+import { EncounterService } from '../services/encounter.service';
 
 @Component({
   selector: 'app-enrollment',
   templateUrl: './enrollment.page.html',
   styleUrls: ['./enrollment.page.scss'],
+  providers: [DatePipe]
 })
 export class EnrollmentPage implements OnInit {
   enrollmentForm!: FormGroup;
+  encounterType = '90dd679a-7f5d-4f59-9d9c-abb91abde9fa';
+  programmeUuid = 'c6a2e0c1-38b1-4474-9bfe-fe4df3680183';
+  formUuid = "2e8e82d6-cd35-4617-839a-6449y9e0725f3";
+
+
 
 
   questions = [
@@ -34,7 +47,7 @@ export class EnrollmentPage implements OnInit {
     },
     {
       label: 'Date of Enrollment',
-      concept: '8166091AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: '166091AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       type: 'date'
     },
     {
@@ -101,7 +114,7 @@ export class EnrollmentPage implements OnInit {
     },
     {
       label: 'Informal Settlement',
-      concept: '167131AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: '64fb6ce0-fac6-48e3-8e8e-0110b2a8724f',
       type: 'text'
     },
     {
@@ -816,32 +829,78 @@ export class EnrollmentPage implements OnInit {
     }
 
   ];
+  patientName!: string;
+  patientUuid: any;
+  locationUuid: any;
+  visitType: any;
+  locations: any[] = [];
+  selectedLocationUuid: string = '';
+  providers: any[] = [];
+  selectedProviderUuid: string = '';
+  startDatetime: string = '';
+  stopDatetime: string = '';
+  encounterDatetime: string = '';
+  selectedLocationName: string = 'Unknown Location';
+  encounterDate: string = '';
+  encounterTime: string = '';
+  orders!: never[];
 
   constructor(
-    private fb: FormBuilder
-  ) { }
+    private fb: FormBuilder,
+    private alertController: AlertController,
+    private route: ActivatedRoute,
+    private encounterService: EncounterService,
+    private datePipe: DatePipe,
+    private router: Router,
 
+
+  ) { }
   ngOnInit() {
     const groupConfig: { [key: string]: any } = {
       responses: this.fb.array([]),
     };
-  
-    this.questions.forEach((question) => {
-      if (question.type === 'checkbox') {
-        groupConfig[question.concept] = this.fb.array([]);
-      } else {
-        groupConfig[question.concept] = this.fb.control('');
-      }
-  
-      (groupConfig['responses'] as FormArray).push(this.fb.control(''));
+
+    this.route.queryParams.subscribe((queryParams) => {
+      this.patientUuid = queryParams['patientUuid'];
+      this.locationUuid = queryParams['locationUuid'];
+      this.visitType = queryParams['visitType'];
+      this.patientName = decodeURIComponent(queryParams['patientName']);
+
+      console.log('Patient UUID:', this.patientUuid);
+      console.log('Location UUID:', this.locationUuid);
+      console.log('Visit Type:', this.visitType);
+      console.log('Patient Name:', this.patientName);
+
+      const nameParts = this.patientName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      this.questions.forEach((question) => {
+        let defaultValue = '';
+
+        if (question.concept === '166102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          defaultValue = firstName;
+        } else if (question.concept === '166103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          defaultValue = lastName;
+        }
+
+        if (question.type === 'checkbox') {
+          groupConfig[question.concept] = this.fb.array([]);
+        } else {
+          groupConfig[question.concept] = this.fb.control(defaultValue);
+        }
+
+        (groupConfig['responses'] as FormArray).push(this.fb.control(defaultValue));
+      });
+
+      this.enrollmentForm = this.fb.group(groupConfig);
+
+      this.setupFollowUpQuestionSubscriptions();
     });
-  
-    this.enrollmentForm = this.fb.group(groupConfig);
-  
-    this.setupFollowUpQuestionSubscriptions();
   }
-  
-  
+
+
+
   private setupFollowUpQuestionSubscriptions() {
     const followUpQuestions = [
       { index: 41, uuid: 'c1b883da-9dde-4c3e-9653-3512908ccf6d' },
@@ -849,7 +908,7 @@ export class EnrollmentPage implements OnInit {
       { index: 50, uuid: '9231c367-cb08-4634-8fbd-98f6cfc322d6' },
       { index: 59, uuid: 'a396eecc-1850-431d-8579-f606ece573a8' },
     ];
-  
+
     followUpQuestions.forEach(({ index, uuid }) => {
       const control = (this.enrollmentForm.get('responses') as FormArray)?.at(index);
       if (control) {
@@ -860,54 +919,54 @@ export class EnrollmentPage implements OnInit {
       }
     });
   }
-  
-  
+
+
   get responses(): FormArray {
     return this.enrollmentForm.get('responses') as FormArray;
   }
   onSelectChange(event: any, concept: string) {
     console.log('Dropdown value changed:', event.target.value);
-    const followUpFor = this.getFollowUpConcept(event.target.value, concept); 
+    const followUpFor = this.getFollowUpConcept(event.target.value, concept);
     this.toggleFollowUpQuestions(event.target.value, followUpFor);
   }
-  
+
   getFollowUpConcept(value: string, concept: string): string {
     const question = this.questions.find(q => q.concept === concept && q.options && q.options.some(option => option.value === value));
     return question ? question.concept : '';
   }
-  
+
   toggleFollowUpQuestions(value: string, followUpFor: string) {
     console.log('Toggling Follow-Up Questions for value:', value, 'and followUpFor:', followUpFor);
-  
+
     const question = this.questions.find(q => q.concept === followUpFor);
     if (!question) {
       console.error(`No question found for concept '${followUpFor}'`);
       return;
     }
-  
+
     console.log('Found question:', question);
-  
+
     const dependentQuestions = this.questions.filter(q => q.followUpFor === followUpFor);
-  
+
     if (!dependentQuestions) {
       console.error(`No dependent questions found for concept '${followUpFor}'`);
       return;
     }
-  
+
     console.log('Dependent Questions:', dependentQuestions);
-  
+
     dependentQuestions.forEach(dependentQuestion => {
       console.log(`Setting hide for question ${dependentQuestion.label}:`, value !== '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-      dependentQuestion.hide = value !== '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';  
+      dependentQuestion.hide = value !== '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
     });
-  
+
     this.questions = [...this.questions];
   }
 
   onCheckboxChange(event: Event, concept: string, value: string): void {
     const checkbox = event.target as HTMLInputElement;
     const control = this.enrollmentForm.get(concept) as FormArray;
-  
+
     if (control) {
       if (checkbox.checked) {
         // Add value if checked and not already present
@@ -924,42 +983,133 @@ export class EnrollmentPage implements OnInit {
     } else {
       console.error(`Control for concept '${concept}' not found.`);
     }
-    
+
     // Debug: Log current FormArray state
     console.log('Updated FormArray for concept:', concept, control.value);
-  }  
-  
-  submitForm() {
-    const formValue = this.enrollmentForm.value; // Get the entire form value
-  
-    // Map each question to its submission format
-    const obs = this.questions.map((question, index) => {
-      let value;
-  
-      if (question.type === 'checkbox') {
-        // Get the value directly from the FormArray for this concept
-        const control = this.enrollmentForm.get(question.concept) as FormArray;
-        value = control?.value || [];
-        console.log(`Checkbox value for ${question.concept}:`, value);
-      } else {
-        // Get the value from the responses array
-        value = formValue.responses[index] || null;
-      }
-  
-      // Return the formatted object for submission
-      return {
-        concept: { uuid: question.concept },
-        value: Array.isArray(value)
-          ? value.map((v: string) => ({ uuid: v }))
-          : value,
-      };
-    });
-  
-    // Debug: Log the submitted data
-    console.log('Submitted data:', obs);
   }
-  
-  
-  
-}
 
+  submitEnrollment() {
+    const formValue = this.enrollmentForm.value;
+  
+    const dateEnrolled = formValue.dateEnrolled
+      ? this.datePipe.transform(formValue.dateEnrolled, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+      : this.datePipe.transform(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  
+    const patientUuid = this.patientUuid;
+    const locationUuid = this.locationUuid;
+    const programUuid = this.programmeUuid ;
+  
+    // Define an array of concept UUIDs to keep
+    const allowedConcepts = [
+      "f122e57d-975d-4613-9a38-aa5761b37894",
+      "166102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "166103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "166091AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "166575AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "20155670-962e-4b62-81b8-a838ea6a2515",
+      "2cd4ff70-ff4c-4b3b-ba26-641a9e1ca2f6",
+      "b71619d4-6f61-41f7-a04e-aa0bb6db09be",
+      "159635AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "167131AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "1354AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "3e68392c-416e-4f9d-953f-5179903634d3",
+      "0c41e29f-cc27-4c83-aeb6-48d882a20976",
+      "91b90f76-8942-4ba7-aecd-97baff0ecef6",
+      "4d663c31-b819-45fc-90eb-4936f23f09c4",
+      "7ba5276f-e9bf-468f-b31b-82664378b7b7"
+    ];
+  
+    const obs = this.questions
+      .map((question, index) => {
+        if (!allowedConcepts.includes(question.concept)) return null; // Exclude unwanted concepts
+  
+        let value;
+        if (question.type === "checkbox") {
+          const control = this.enrollmentForm.get(question.concept) as FormArray;
+          value = control?.value || [];
+        } else {
+          value = formValue.responses[index] || null;
+        }
+  
+        return {
+          concept: question.concept,
+          value: Array.isArray(value) ? value.map((v: string) => ({ uuid: v })) : value,
+        };
+      })
+      .filter(
+        (obsItem) =>
+          obsItem !== null &&
+          obsItem.value !== null &&
+          obsItem.value !== "" &&
+          !(Array.isArray(obsItem.value) && obsItem.value.length === 0)
+      );
+  
+    // Construct payload
+    const encounterPayload = {
+      patient: patientUuid,
+      visit: this.visitType,
+      encounterType: this.encounterType ,
+      form: this.formUuid,
+      obs: obs,
+      orders: [],
+      diagnoses: [],
+      location: locationUuid,
+    };
+  
+    console.log("Encounter Payload:", encounterPayload);  
+  
+    // Call the first API (Encounter)
+    // Call the first API (Encounter)
+this.encounterService.submitEncounter(encounterPayload).pipe(
+  switchMap((encounterResponse: any) => {
+    console.log("Encounter submitted successfully:", encounterResponse);
+
+    // Construct payload for the second API (Program Enrollment)
+    const programEnrollmentPayload = {
+      patient: patientUuid,
+      program: programUuid,
+      dateEnrolled,
+      dateCompleted: null,
+      location: locationUuid,
+    };
+
+    // Debug: Log the program enrollment payload
+    console.log("Submitting Program Enrollment:", programEnrollmentPayload);
+
+    // Call the second API (Program Enrollment) and return both responses
+    return this.encounterService.submitEnrollment(programEnrollmentPayload).pipe(
+      map((programEnrollmentResponse: any) => ({ encounterResponse, programEnrollmentResponse }))
+    );
+  })
+).subscribe(
+  async ({ encounterResponse, programEnrollmentResponse }) => {
+    console.log("Program enrollment successful:", programEnrollmentResponse);
+
+    // Show success alert before navigation
+    const alert = await this.alertController.create({
+      header: "Success",
+      message: "Enrollment completed successfully!",
+      buttons: [
+        {
+          text: "OK",
+          handler: () => {
+            // Navigate to 'service-uptake' with BOTH responses
+            this.router.navigate(['/service-uptake'], {
+              queryParams: { 
+                enrollmentData: JSON.stringify(programEnrollmentResponse), 
+                encounterData: JSON.stringify(encounterResponse) 
+              }
+            });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  },
+  (error: any) => {
+    console.error("Error during enrollment process:", error);
+  }
+);
+  }
+}

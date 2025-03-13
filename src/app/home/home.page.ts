@@ -118,36 +118,42 @@ export class HomePage implements OnInit {
 
   searchPatients(query: string) {
     this.loading = true;
-
-    setTimeout(() => {
-      this.encounterService.searchPatients(query).subscribe(
-        (results) => {
-          if (results.results.length === 0) {
-            this.patientSearchResults = [];
-            this.noResults = true;
-            this.loading = false;
-            return;
-          }
-
-          this.patientSearchResults = results.results;
-          console.log('Search results:', this.patientSearchResults);
-
-          this.patientSearchResults.forEach((patient, index) => {
-            this.encounterService.checkIfPatientHasActiveVisit(patient.uuid).subscribe((hasActiveVisit: boolean) => {
-              this.patientSearchResults[index].hasActiveVisit = hasActiveVisit;
-            });
-          });
-
-          this.noResults = false;
+  
+    this.encounterService.searchPatients(query).subscribe(
+      (results) => {
+        if (results.results.length === 0) {
+          this.patientSearchResults = [];
+          this.noResults = true;
           this.loading = false;
-        },
-        (error) => {
-          console.error('Error searching patients:', error);
-          this.loading = false;
+          return;
         }
-      );
-    });
-  }
+  
+        this.patientSearchResults = results.results;
+        console.log("Search results:", this.patientSearchResults);
+  
+        const patientUuids = this.patientSearchResults.map((patient) => patient.uuid);
+  
+        // Fetch all visit data in one API call
+        this.encounterService.getPatientsVisits(patientUuids).subscribe((visits: any[]) => {
+          this.patientSearchResults = this.patientSearchResults.map((patient) => {
+            const visit = visits.find((v) => v.patient.uuid === patient.uuid);
+            return {
+              ...patient,
+              hasActiveVisit: visit ? !visit.stopDatetime : false, // True if stopDatetime is null
+            };
+          });
+  
+          this.loading = false;
+        });
+  
+        this.noResults = false;
+      },
+      (error) => {
+        console.error("Error searching patients:", error);
+        this.loading = false;
+      }
+    );
+  }  
   
   
   goToRegistration() {
@@ -164,13 +170,12 @@ export class HomePage implements OnInit {
     const name = patient.person.display || "Unknown";
     const age = patient.person.age 
     
-    // Extract the identifier (ID)
     let idPart = "N/A"; 
     if (patient.identifiers && patient.identifiers.length > 0) {
       idPart = patient.identifiers[0].identifier; 
     }
   
-    this.navCtrl.navigateForward(`/patient-summary/${uuid}/${idPart}/${age}/${encodeURIComponent(name)}`);
+    this.navCtrl.navigateForward(`/patients/${uuid}/${idPart}/${age}/${encodeURIComponent(name)}`);
   }
   
   

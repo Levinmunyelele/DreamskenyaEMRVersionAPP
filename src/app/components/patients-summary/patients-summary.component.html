@@ -1,32 +1,6 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Patient Summary</ion-title>
-  </ion-toolbar>
-</ion-header>
 
 <ion-content>
-  <!-- Patient Information Card -->
-  <ion-card class="profile-container">
-    <!-- Avatar -->
-    <div class="avatar">
-      <span>{{ getInitials(patientName) }}</span>
-    </div>
-
-    <!-- Patient Details -->
-    <div class="patient-info">
-      <h2>{{ patientName }}</h2>
-      <h6>{{ patientAge }} Years</h6>
-      <p>ID: {{ patientId }}</p>
-
-      <!-- Visit Status -->
-      <div class="visit-status" >
-        Active Visit
-      </div>
-    </div>
-  </ion-card>
+ 
 
   <ion-grid>
     <ion-row>
@@ -110,3 +84,4 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+

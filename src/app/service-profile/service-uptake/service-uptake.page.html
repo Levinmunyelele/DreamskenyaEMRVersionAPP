@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Service Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="assets/girl.png" alt="Profile Picture" />
+      </ion-avatar>
+      <ion-label>
+        <p><strong>AGYW Name:</strong> {{ getPatientName() }}</p>
+        <p><strong>DREAMS ID:</strong> {{ getDreamsId() }}</p>
+        <p *ngIf="birthDate">
+          <strong>DATE OF BIRTH:</strong> {{ formatDate(birthDate) }} ({{ age }} years)
+        </p>
+        <p *ngIf="!birthDate">
+          <strong>DATE OF BIRTH:</strong> N/A
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-card>
+  
+
+  <ion-segment [(ngModel)]="selectedSegment" (ionChange)="onSegmentChanged($event)">
+    <ion-segment-button value="service-uptake">
+      <ion-label>Service Uptake</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="application-forms">
+      <ion-label>Application Forms</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="additional-services">
+      <ion-label>Additional Services</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="enrolle">
+      <ion-label>Enrolle</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  
+  <!-- Service Uptake List -->
+  <ion-list *ngIf="selectedSegment === 'service-uptake'">
+    <ion-item button [routerLink]="['behavioural']">
+      <ion-icon name="basket-outline" slot="start"></ion-icon>
+      <ion-label>Behavioural Services</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  
+    <ion-item button [routerLink]="['bio-medical']">
+      <ion-icon name="flask-outline" slot="start"></ion-icon>
+      <ion-label>Bio-medical Services</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  
+    <ion-item button [routerLink]="['post-violence']">
+      <ion-icon name="hand-left-outline" slot="start"></ion-icon>
+      <ion-label>Post-Violence Care Services</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  
+    <ion-item button [routerLink]="['social-protection']">
+      <ion-icon name="shield-outline" slot="start"></ion-icon>
+      <ion-label>Social Protection Services</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  
+    <ion-item button [routerLink]="['other']">
+      <ion-icon name="people-outline" slot="start"></ion-icon>
+      <ion-label>Other Services</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+    </ion-item>
+  </ion-list>
+  
+  <!-- Application Forms Content -->
+  <ion-list *ngIf="selectedSegment === 'application-forms'">
+    <ion-item>
+      <ion-label>Application Forms Content Here</ion-label>
+    </ion-item>
+  </ion-list>
+  
+  <!-- Additional Services Content -->
+  <ion-list *ngIf="selectedSegment === 'additional-services'">
+    <ion-item>
+      <ion-label>Additional Services Content Here</ion-label>
+    </ion-item>
+  </ion-list>
+  
+  <!-- Enrolle Content -->
+  <ion-list *ngIf="selectedSegment === 'enrolle'">
+    <ion-item>
+      <ion-label>Enrolle Content Here</ion-label>
+    </ion-item>
+  </ion-list>
+  

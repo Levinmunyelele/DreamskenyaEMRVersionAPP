@@ -1,43 +1,63 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Screened AGYW</ion-title>
+  <ion-toolbar>
+    <ion-title>Screened Patients</ion-title>
     <ion-buttons slot="start">
       <ion-back-button default-href="home"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <!-- Loading Spinner -->
-  <div *ngIf="loadingLocations" class="loading-container">
-    <ion-spinner name="crescent"></ion-spinner>
-    <p>Loading locations...</p>
+<ion-content class="screened-container">
+  <!-- Buttons in a row -->
+  <div class="button-container">
+    <ion-button 
+      [color]="activeTab === 'eligible' ? 'primary' : 'medium'" 
+      (click)="setActiveTab('eligible')"
+      class="tab-button"
+    >
+      Eligible
+    </ion-button>
+
+    <ion-button 
+      [color]="activeTab === 'ineligible' ? 'primary' : 'medium'" 
+      (click)="setActiveTab('ineligible')"
+      class="tab-button"
+    >
+      Ineligible 
+    </ion-button>
   </div>
 
-  <!-- Error Message for Loading Locations -->
-  <div *ngIf="errorLoadingLocations" class="error-container">
-    <p>Error loading locations. Please try again later.</p>
+  <!-- Eligible Patients Section -->
+  <div *ngIf="activeTab === 'eligible'" class="patients-list">
+    <ion-card *ngFor="let patient of eligiblePatients" class="patient-card">
+      <ion-card-header>
+        <div class="patient-header">
+          <ion-avatar class="patient-avatar">
+            <img src="assets/girl.png" alt="Girl Avatar">
+          </ion-avatar>
+          <ion-card-title>{{ patient.name }}</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>ID:</strong> {{ patient.id }}</p>
+      </ion-card-content>
+    </ion-card>
   </div>
 
-  <!-- Data Table -->
-  <div *ngIf="!loadingLocations && !errorLoadingLocations" class="table-container">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Patient</th>
-          <th>Provider</th>
-          <th>Location</th>
-          <th>Eligible</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let data of screeningDataList">
-          <td>{{ data.patient.uuid || 'N/A' }}</td>
-          <td>{{ getProviderName(data.provider.uuid || '') }}</td>
-          <td>{{ getLocationName(data.location.uuid || '') }}</td>
-          <td>{{ getEligibility(data.obs) }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Ineligible Patients Section -->
+  <div *ngIf="activeTab === 'ineligible'" class="patients-list">
+    <ion-card *ngFor="let patient of ineligiblePatients" class="patient-card">
+      <ion-card-header>
+        <div class="patient-header">
+          <ion-avatar class="patient-avatar">
+            <img src="assets/girl.png" alt="Girl Avatar">
+          </ion-avatar>
+          <ion-card-title>{{ patient.name }}</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>ID:</strong> {{ patient.id }}</p>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>

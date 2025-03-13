@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ patientName }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ✅ Ensure contentId matches id="main-content" -->
+<ion-menu side="end" contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <ion-item button (click)="showSection('summary')">
+        <ion-icon name="home-outline" slot="start"></ion-icon>
+        <ion-label>Patient Summary</ion-label>
+      </ion-item>
+      <ion-item button (click)="showSection('vitals')">
+        <ion-icon name="heart-outline" slot="start"></ion-icon>
+        <ion-label>Vitals</ion-label>
+      </ion-item>
+      <ion-item button (click)="showSection('medications')">
+        <ion-icon name="medkit-outline" slot="start"></ion-icon>
+        <ion-label>Medications</ion-label>
+      </ion-item>
+      <ion-item button (click)="showSection('allergies')">
+        <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+        <ion-label>Allergies</ion-label>
+      </ion-item>
+      <ion-item button (click)="showSection('immunizations')">
+        <ion-icon name="bandage-outline" slot="start"></ion-icon>
+        <ion-label>Immunizations</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- ✅ Ensure id="main-content" matches contentId -->
+<ion-content id="main-content" [fullscreen]="true">
+  <ion-card class="profile-container">
+    <div class="avatar">
+      <span>{{ getInitials(patientName) }}</span>
+    </div>
+
+    <div class="patient-info">
+      <h2>{{ patientName }}</h2>
+      <h6>{{ patientAge }} Years</h6>
+      <p>ID: {{ patientId }}</p>
+
+      <div class="visit-status">
+        Active Visit
+      </div>
+    </div>
+  </ion-card>
+
+  <!-- 🔥 Dynamically load the selected section -->
+  <ng-container *ngIf="selectedSection === 'summary'">
+    <app-patients-summary></app-patients-summary>
+  </ng-container>
+  <ng-container *ngIf="selectedSection === 'vitals'">
+    <app-vitals></app-vitals>
+  </ng-container>
+  <ng-container *ngIf="selectedSection === 'medications'">
+    <p>Medications Section Coming Soon...</p>
+  </ng-container>
+  <ng-container *ngIf="selectedSection === 'allergies'">
+    <p>Allergies Section Coming Soon...</p>
+  </ng-container>
+  <ng-container *ngIf="selectedSection === 'immunizations'">
+    <p>Immunizations Section Coming Soon...</p>
+  </ng-container>
+</ion-content>

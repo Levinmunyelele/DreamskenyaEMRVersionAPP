@@ -1,36 +1,96 @@
-/* Add this to the component's CSS (screened-agwy.page.scss) */
-
-.loading-container,
-.error-container {
-  text-align: center;
-  margin-top: 20px;
+.screened-container {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.loading-container ion-spinner {
+/* Buttons Styling */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
 }
 
-.error-container p {
-  color: red;
+.tab-button {
+  width: 48%;
+  text-align: center;
   font-weight: bold;
-}
-
-.table-container {
-  margin-top: 20px;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th,
-.data-table td {
+  font-size: 0.9rem;
+  border-radius: 8px;
   padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
 }
 
-.data-table th {
-  background-color: #f4f4f4;
+.tab-button:hover {
+  transform: scale(1.05);
+}
+
+ion-button.primary {
+  background-color: #1d434e;
+  color: white;
+}
+
+ion-button.medium {
+  background-color: #b0b0b0;
+  color: white;
+}
+
+/* Patient List */
+.patients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Smaller & Sleek Patient Card */
+.patient-card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
+  border-left: 4px solid #1d434e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease-in-out;
+}
+
+.patient-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Avatar & Name Row */
+.patient-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Avatar */
+.patient-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #1d434e;
+}
+
+.patient-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Patient Details */
+ion-card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+ion-card-content p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 3px;
 }

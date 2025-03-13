@@ -1,7 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Starting a visit for <strong>{{ patientName }}</strong></ion-title>
-    <ion-buttons slot="start">
+    <ion-title>
+      Starting a visit for <strong>{{ patientName || cleanName || 'Unknown Patient' }}</strong>
+    </ion-title>
+        <ion-buttons slot="start">
       <ion-back-button default-href="home"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
