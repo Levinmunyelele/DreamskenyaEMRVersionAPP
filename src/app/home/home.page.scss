@@ -8,41 +8,25 @@ ion-content {
 }
 
 /* Greeting Message */
-.greeting-message {
-  text-align: center;
-  margin-bottom: 30px;
-
-  h1 {
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: #e7b556;
-  }
-
-  p {
-    font-size: 1.2rem;
-    color: #e7b556;
-  }
-}
-
-/* Greeting Card */
 .greeting-card {
-  background: linear-gradient(to right, #1d434e, #2c6975);
+  background: linear-gradient(to right, #26247B, #4A47A3);
   color: white;
   text-align: center;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  .greeting-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-
-  .date {
-    font-size: 1rem;
-    opacity: 0.8;
-  }
 }
+
+.greeting-card .greeting-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.greeting-card .date {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
 
 /* Search Card */
 .search-card {
@@ -51,7 +35,7 @@ ion-content {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 15px;
   transition: transform 0.3s ease-in-out;
-  border-left: 5px solid #1d434e;
+  border-left: 5px solid #26247B;
 
   &:hover {
     transform: translateY(-5px);
@@ -60,7 +44,7 @@ ion-content {
   .search {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #1d434e;
+    color: #26247B;
     text-align: center;
   }
 }
@@ -86,7 +70,7 @@ ion-content {
   .search-button {
     margin-top: 10px;
     --border-radius: 8px;
-    --background: #1d434e;
+    --background: #26247B;
     --color: white;
     font-size: 1.1rem;
     transition: background 0.3s ease-in-out;
@@ -124,7 +108,7 @@ ion-content {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out;
-  border-left: 5px solid #1d434e;
+  border-left: 5px solid #26247B;
   cursor: pointer;
 
   &:hover {
@@ -132,7 +116,7 @@ ion-content {
   }
 
   ion-card-header {
-    background-color: #1d434e;
+    background-color: #26247B;
     color: white;
     text-align: center;
     padding: 12px;
@@ -175,7 +159,7 @@ ion-content {
 
     h3 {
       font-size: 1.1rem;
-      color: #1d434e;
+      color: #26247B;
       margin-bottom: 5px;
     }
 

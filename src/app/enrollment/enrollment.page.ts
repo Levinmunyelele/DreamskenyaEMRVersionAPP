@@ -999,7 +999,6 @@ export class EnrollmentPage implements OnInit {
     const locationUuid = this.locationUuid;
     const programUuid = this.programmeUuid ;
   
-    // Define an array of concept UUIDs to keep
     const allowedConcepts = [
       "f122e57d-975d-4613-9a38-aa5761b37894",
       "166102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -1021,7 +1020,7 @@ export class EnrollmentPage implements OnInit {
   
     const obs = this.questions
       .map((question, index) => {
-        if (!allowedConcepts.includes(question.concept)) return null; // Exclude unwanted concepts
+        if (!allowedConcepts.includes(question.concept)) return null; 
   
         let value;
         if (question.type === "checkbox") {
@@ -1044,7 +1043,6 @@ export class EnrollmentPage implements OnInit {
           !(Array.isArray(obsItem.value) && obsItem.value.length === 0)
       );
   
-    // Construct payload
     const encounterPayload = {
       patient: patientUuid,
       visit: this.visitType,
@@ -1058,13 +1056,10 @@ export class EnrollmentPage implements OnInit {
   
     console.log("Encounter Payload:", encounterPayload);  
   
-    // Call the first API (Encounter)
-    // Call the first API (Encounter)
 this.encounterService.submitEncounter(encounterPayload).pipe(
   switchMap((encounterResponse: any) => {
     console.log("Encounter submitted successfully:", encounterResponse);
 
-    // Construct payload for the second API (Program Enrollment)
     const programEnrollmentPayload = {
       patient: patientUuid,
       program: programUuid,
@@ -1073,10 +1068,8 @@ this.encounterService.submitEncounter(encounterPayload).pipe(
       location: locationUuid,
     };
 
-    // Debug: Log the program enrollment payload
     console.log("Submitting Program Enrollment:", programEnrollmentPayload);
 
-    // Call the second API (Program Enrollment) and return both responses
     return this.encounterService.submitEnrollment(programEnrollmentPayload).pipe(
       map((programEnrollmentResponse: any) => ({ encounterResponse, programEnrollmentResponse }))
     );
@@ -1085,7 +1078,6 @@ this.encounterService.submitEncounter(encounterPayload).pipe(
   async ({ encounterResponse, programEnrollmentResponse }) => {
     console.log("Program enrollment successful:", programEnrollmentResponse);
 
-    // Show success alert before navigation
     const alert = await this.alertController.create({
       header: "Success",
       message: "Enrollment completed successfully!",
@@ -1093,9 +1085,9 @@ this.encounterService.submitEncounter(encounterPayload).pipe(
         {
           text: "OK",
           handler: () => {
-            // Navigate to 'service-uptake' with BOTH responses
             this.router.navigate(['/service-uptake'], {
               queryParams: { 
+                visit: this.visitType,
                 enrollmentData: JSON.stringify(programEnrollmentResponse), 
                 encounterData: JSON.stringify(encounterResponse) 
               }

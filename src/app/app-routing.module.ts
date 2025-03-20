@@ -73,7 +73,7 @@ const routes: Routes = [
     loadChildren: () => import('./patients/patients.module').then( m => m.PatientsPageModule)
   },
   {
-    path: 'service-uptake',
+    path: 'service-uptake/:uuid',
     loadChildren: () => import('./service-profile/service-uptake/service-uptake.module').then( m => m.ServiceUptakePageModule)
   },
   {

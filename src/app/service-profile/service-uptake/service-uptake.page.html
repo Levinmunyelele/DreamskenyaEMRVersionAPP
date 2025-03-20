@@ -4,6 +4,11 @@
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
     <ion-title>Service Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentActionSheet()">
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -25,74 +30,168 @@
       </ion-label>
     </ion-item>
   </ion-card>
-  
 
-  <ion-segment [(ngModel)]="selectedSegment" (ionChange)="onSegmentChanged($event)">
-    <ion-segment-button value="service-uptake">
-      <ion-label>Service Uptake</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="application-forms">
-      <ion-label>Application Forms</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="additional-services">
-      <ion-label>Additional Services</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="enrolle">
-      <ion-label>Enrolle</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-  
+  <div style="width: 100%; overflow-x: auto;">
+    <ion-segment mode="md" [(ngModel)]="selectedSegment" (ionChange)="onSegmentChanged($event)" scrollable>
+      <ion-segment-button value="service-uptake">
+        <ion-label>Service uptake</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="application-forms">
+        <ion-label>Application forms</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="additional-services">
+        <ion-label>Additional services</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="enrolle">
+        <ion-label>Enrolment details</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+
   <!-- Service Uptake List -->
   <ion-list *ngIf="selectedSegment === 'service-uptake'">
-    <ion-item button [routerLink]="['behavioural']">
-      <ion-icon name="basket-outline" slot="start"></ion-icon>
-      <ion-label>Behavioural Services</ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-    </ion-item>
-  
-    <ion-item button [routerLink]="['bio-medical']">
-      <ion-icon name="flask-outline" slot="start"></ion-icon>
-      <ion-label>Bio-medical Services</ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-    </ion-item>
-  
-    <ion-item button [routerLink]="['post-violence']">
-      <ion-icon name="hand-left-outline" slot="start"></ion-icon>
-      <ion-label>Post-Violence Care Services</ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-    </ion-item>
-  
-    <ion-item button [routerLink]="['social-protection']">
-      <ion-icon name="shield-outline" slot="start"></ion-icon>
-      <ion-label>Social Protection Services</ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-    </ion-item>
-  
-    <ion-item button [routerLink]="['other']">
-      <ion-icon name="people-outline" slot="start"></ion-icon>
-      <ion-label>Other Services</ion-label>
-      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
-    </ion-item>
+    <ion-card>
+      <ion-item button [routerLink]="['behavioural']" [queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: form,
+        encounterType: encounterType
+      }">
+        <ion-icon name="basket-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Behavioural Services</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+    
+
+    <ion-card>
+      <ion-item button [routerLink]="['bio-medical']" [queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: form,
+        encounterType: encounterType
+      }">
+        <ion-icon name="flask-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Bio-medical Services</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+    
+    <ion-card>
+      <ion-item button [routerLink]="['post-violence']">
+        <ion-icon name="hand-left-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Post-Violence Care Services</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['social-protection']">
+        <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Social Protection Services</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['other']">
+        <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Other Services</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
   </ion-list>
-  
-  <!-- Application Forms Content -->
+
   <ion-list *ngIf="selectedSegment === 'application-forms'">
-    <ion-item>
-      <ion-label>Application Forms Content Here</ion-label>
-    </ion-item>
+    <ion-card>
+      <ion-item button [routerLink]="['enrollment-form']">
+        <ion-icon name="school-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Education Subsidies Application Form</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['hts-eligibility']">
+        <ion-icon name="clipboard-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>HTS Eligibility Tool</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['home-visit']">
+        <ion-icon name="home-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Education Support: Home Visit</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['prep-rast']">
+        <ion-icon name="pulse-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>PreP Rapid Assessment Tool (RAST)</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['violence-screening']">
+        <ion-icon name="shield-checkmark-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Violence Screening and Service Summary Form</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['business-follow-up']">
+        <ion-icon name="briefcase-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Business Start-up - Follow-up Tool</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['agyw-graduation']">
+        <ion-icon name="trophy-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>AGYW Graduation Scorecard</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['sti-screening']">
+        <ion-icon name="medkit-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>STI Screening Tool</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
+
+    <ion-card>
+      <ion-item button [routerLink]="['business-assessment']">
+        <ion-icon name="stats-chart-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>Business Start-up Assessment & Rating Tool</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+      </ion-item>
+    </ion-card>
   </ion-list>
-  
+
+
   <!-- Additional Services Content -->
   <ion-list *ngIf="selectedSegment === 'additional-services'">
     <ion-item>
       <ion-label>Additional Services Content Here</ion-label>
     </ion-item>
   </ion-list>
-  
+
   <!-- Enrolle Content -->
   <ion-list *ngIf="selectedSegment === 'enrolle'">
     <ion-item>
       <ion-label>Enrolle Content Here</ion-label>
     </ion-item>
   </ion-list>
-  

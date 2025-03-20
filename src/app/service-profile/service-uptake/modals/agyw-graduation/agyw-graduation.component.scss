@@ -1,0 +1,150 @@
+::ng-deep .popup-modal {
+    --width: 80%;
+    --max-width: 500px;
+    --height: auto;
+    --border-radius: 15px;
+    --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    --background: white;
+    --top: 15%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure modal appears as a pop-up on smaller screens */
+  @media screen and (max-width: 500px) {
+    ::ng-deep .popup-modal {
+      --width: 90%;
+      --max-width: 90%;
+      --height: 70vh;
+      --top: 10%;
+    }
+  }
+  
+  /* Dimmed backdrop */
+  .popup-modal::part(backdrop) {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  
+  .header {
+    --background: #1d434e;
+    color: white;
+    ion-title {
+      font-weight: bold;
+    }
+  }
+  
+  .toolbar {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  .content {
+    padding: 20px;
+    background: #f4f4f4;
+  }
+  
+  .form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  .checkbox-group {
+    margin-top: 12px;
+  }
+  
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox-label {
+    margin-left: 10px;
+  }
+  
+  .input-field {
+    border-bottom: 2px solid #1d434e;
+  }
+  
+  .submit-btn {
+    background: #1d434e;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  ion-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  ion-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+  }
+  
+  ion-card-title {
+    font-size: 1.1rem;
+    color: #1d434e;
+  }
+  
+  ion-card-content {
+    padding: 14px;
+  }
+  
+  ion-button {
+    margin-top: 14px;
+    --border-radius: 10px;
+    --background: #1d434e;
+    color: white;
+    font-weight: bold;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .left-button {
+    flex: 1;
+    max-width: 120px; /* Adjust width as needed */
+  }
+  
+  .right-button {
+    flex: 1;
+    max-width: 120px;
+  }
+
+  .custom-input {
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px; /* Padding inside the input */
+    width: 100%; /* Full width */
+    box-shadow: none; /* Remove default shadow */
+    background: white; /* Background color */
+  }
+  
+  

@@ -1,221 +1,49 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Screening Form</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button default-href="home"></ion-back-button>
+      <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
+    <ion-title>Service Uptake</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <form [formGroup]="screeningForm" (ngSubmit)="submitForm()">
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Encounter Details</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Date of Encounter</ion-label>
-          <ion-input type="date" formControlName="date" ></ion-input>
-        </ion-item>
+<ion-content class="ion-padding">
 
-        <ion-item lines="none">
-          <ion-label class="label">Provider</ion-label>
-          <ion-input formControlName="provider" placeholder="Enter provider name"></ion-input>
-        </ion-item>
+  <!-- Search Bar -->
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Search By DREAMS ID OR AGYW Name</ion-label>
+        <ion-input [(ngModel)]="searchQuery"></ion-input>
+      </ion-item>
+      <ion-button expand="full" color="primary" (click)="searchPatients()">
+        <ion-icon name="search" slot="start"></ion-icon> Search
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 
-        <ion-item lines="none">
-          <ion-label class="label">Location</ion-label>
-          <ion-input formControlName="location" placeholder="Enter location"></ion-input>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="dots"></ion-spinner>
+  </div>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Enrollment & ID</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Ever Enrolled in Dreams</ion-label>
-          <ion-select formControlName="enrolled">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
+  <ion-card *ngFor="let patient of patientSearchResults" (click)="viewPatient(patient)">
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="assets/girl.png" alt="Patient">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ patient.name }}</h2>
+        <p><strong>Dreams ID:</strong> {{ patient.dreamsId }}</p>
+        <p><strong>Date of Birth:</strong> {{ patient.dob }} ({{ getAge(patient.dob) }} Years)</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon> 
+    </ion-item>
+  </ion-card>
+  
+  <!-- No Results Message -->
+  <ion-text *ngIf="noResults" class="ion-text-center">
+    No patients found.
+  </ion-text>
 
-        <ion-item *ngIf="screeningForm.value.enrolled === 'yes'" lines="none">
-          <ion-label class="label">Dreams ID</ion-label>
-          <ion-input formControlName="id" placeholder="Enter your ID"></ion-input>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Marital & Living Status</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Marital Status</ion-label>
-          <ion-select formControlName="status">
-            <ion-select-option value="single">Single</ion-select-option>
-            <ion-select-option value="married">Married</ion-select-option>
-            <ion-select-option value="divorced">Divorced</ion-select-option>
-            <ion-select-option value="widowed">Widowed</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Who do you frequently live with?</ion-label>
-          <ion-select formControlName="live">
-            <ion-select-option value="lives_with_friends">Lives with friends</ion-select-option>
-            <ion-select-option value="lives_with_parents">Lives with parents</ion-select-option>
-            <ion-select-option value="lives_with_siblings">Lives with siblings</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Disability Details</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Do you have any form of disability?</ion-label>
-          <ion-select formControlName="disability">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item *ngIf="screeningForm.value.disability === 'yes'" lines="none">
-          <ion-label class="label">Type of Disability</ion-label>
-          <ion-select formControlName="disabilityType">
-            <ion-select-option value="hearing_loss">Hearing Loss</ion-select-option>
-            <ion-select-option value="impaired_speech">Impaired Speech</ion-select-option>
-            <ion-select-option value="mental_disability">Mental Disability</ion-select-option>
-            <ion-select-option value="visual_impairment">Visual Impairment</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Health & Status Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Ever Had Sex</ion-label>
-          <ion-select formControlName="sex">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item *ngIf="screeningForm.value.sex === 'yes'" lines="none">
-          <ion-label class="label">Has had more than one sexual partner in the last 12 months?</ion-label>
-          <ion-select formControlName="months">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item *ngIf="screeningForm.value.sex === 'yes'" lines="none">
-          <ion-label class="label">Received Money/Favors in exchange for sex</ion-label>
-          <ion-select formControlName="gifts">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item *ngIf="screeningForm.value.sex === 'yes'" lines="none">
-          <ion-label class="label">Diagnosed or Treated for STI</ion-label>
-          <ion-select formControlName="sti">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Family & Violence Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Has a Child / Pregnant / Been Pregnant</ion-label>
-          <ion-select formControlName="pregnant">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Undergoing Violence (Physical/Emotional/Sexual/Economic)</ion-label>
-          <ion-select formControlName="violence">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Head of the Household</ion-label>
-          <ion-select formControlName="head">
-            <ion-select-option value="sibling">Sibling</ion-select-option>
-            <ion-select-option value="mother">Mother</ion-select-option>
-            <ion-select-option value="father">Father</ion-select-option>
-            <ion-select-option value="grandparent">Grandparent</ion-select-option>
-            <ion-select-option value="uncle">Uncle</ion-select-option>
-            <ion-select-option value="aunt">Aunt</ion-select-option>
-            <ion-select-option value="self">Self</ion-select-option>
-            <ion-select-option value="husband_partner">Husband/Partner</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Used Alcohol/Drugs (Addiction)</ion-label>
-          <ion-select formControlName="addiction">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Orphan Status (Partial/Total)</ion-label>
-          <ion-select formControlName="orphan">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Additional Information</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item lines="none">
-          <ion-label class="label">Comment</ion-label>
-          <ion-input formControlName="comment" placeholder="Enter comments"></ion-input>
-        </ion-item>
-
-        <ion-item lines="none">
-          <ion-label class="label">Eligible</ion-label>
-          <ion-select formControlName="eligible">
-            <ion-select-option value="yes">Yes</ion-select-option>
-            <ion-select-option value="no">No</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-button type="submit" expand="block" [disabled]="screeningForm.invalid" (click)="submitForm()">
-      Submit Form
-    </ion-button>
-  </form>
 </ion-content>

@@ -1,0 +1,27 @@
+ion-segment {
+    position: relative;
+    z-index: 10; /* Ensures it's above other content */
+    margin-top: 10px; /* Push it down */
+    -ms-overflow-style: none;  /* Hide scrollbar for IE/Edge */
+    scrollbar-width: none
+  }
+  
+  
+  ion-segment-button {
+    flex: 1;
+    min-width: 120px; /* Prevents overlap */
+    font-size: 14px;
+    text-transform: none;
+    color: #1d434e;
+    border: none;
+    transition: 0.3s;
+  }
+  
+  ion-segment-button[aria-checked="true"] {
+    background: var(--ion-color-primary);
+    color: white !important;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: bold;
+  }
+  

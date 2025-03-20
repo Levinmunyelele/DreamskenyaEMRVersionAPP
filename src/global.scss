@@ -36,16 +36,28 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
-ion-card{
-    --background: white;  
+ion-card {
+    --background: white;
 }
 
-ion-card-title{
-  color: white;
+ion-card-title {
+    color: white;
 }
-ion-select{
+
+ion-select {
     color: black;
 }
-ion-label{
+
+ion-label {
     color: black;
 }
+
+ion-item {
+    --border-width: 0;
+    --inner-border-width: 0;
+}
+
+html, body {
+    font-size: 12px; /* Adjust size as needed */
+  }
+  

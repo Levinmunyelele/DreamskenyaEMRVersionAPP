@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // ✅ Add ReactiveFormsModule
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // 
 
 import { IonicModule } from '@ionic/angular';
 
@@ -11,7 +11,7 @@ import { SocialProtectionModalPage } from './social-protection-modal.page';
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule, // ✅ Add this
+    ReactiveFormsModule,
     IonicModule,
     SocialProtectionModalPageRoutingModule
   ],

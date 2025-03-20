@@ -10,12 +10,12 @@
   <ion-card class="greeting-card">
     <ion-card-content>
       <h1 class="greeting-title">{{ greeting }}</h1>
-      <p class="date">📅 {{ currentDate }}</p>
+      <p class="date">{{ currentDate }}</p>
     </ion-card-content>
   </ion-card>
 
   <!-- Search Card -->
-  <ion-card class="search-card">
+  <ion-card class="home-card">
     <ion-card-header>
       <ion-card-title class="search">Search for Patient</ion-card-title>
     </ion-card-header>
@@ -75,7 +75,7 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- <ion-card class="home-card" [routerLink]="['/service-uptake']">
+  <ion-card class="home-card" [routerLink]="['/screening']">
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="medkit" class="icon"></ion-icon>
@@ -86,5 +86,5 @@
       <p>This section enables searching an AGYW with their DREAMS ID and provides forms to offer services to the girl.
         It consists of both service uptake and application forms.</p>
     </ion-card-content>
-  </ion-card> -->
+  </ion-card>
 </ion-content>

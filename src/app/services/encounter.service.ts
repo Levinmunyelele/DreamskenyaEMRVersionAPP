@@ -20,6 +20,20 @@ export class EncounterService {
     this._storage = await this.storage.create();
   }
 
+  getEncounters(patientUuid: string, encounterType: string): Observable<any[]> {
+    if (!patientUuid || !encounterType) {
+      console.warn("Missing patient UUID or encounter type");
+      return new Observable((observer) => {
+        observer.next([]);
+        observer.complete();
+      });
+    }
+
+    return this.apiService.get(`encounter?patient=${patientUuid}&encounterType=${encounterType}&limit=10&v=full`).pipe(
+      map((response: { results: any[] }) => response.results || [])
+    );
+  } 
+  
   submitEncounter(payload: any): Observable<any> {
     return this.apiService.post('encounter', payload);  
   }
@@ -78,9 +92,9 @@ export class EncounterService {
       if (patientData) {
         const parsedData = JSON.parse(patientData);
         patients.push({
-          id: parsedData.id, // Ensure ID is retrieved correctly
-          name: parsedData.name, // Retrieve the stored name
-          isEligible: parsedData.isEligible // Get eligibility status
+          id: parsedData.id, 
+          name: parsedData.name, 
+          isEligible: parsedData.isEligible 
         });
       }
     }
