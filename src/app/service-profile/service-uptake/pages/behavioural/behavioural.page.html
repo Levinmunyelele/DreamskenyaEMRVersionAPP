@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Behavioural Interventions</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="card-container">
+    <ion-card *ngFor="let encounter of encounters" class="small-card">
+      <ion-card-header class="card-header">
+        <ion-card-title class="card-title">
+          {{ getIntervention(encounter.obs) }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="card-content">
+        <p class="intervention-date">
+          <strong>Intervention Date:</strong> {{ getInterventionDate(encounter.obs) | date:'medium' }}
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Floating Button -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="primary" (click)="openModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
+
+  

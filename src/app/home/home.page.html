@@ -1,0 +1,90 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="header-toolbar">
+    <ion-title>Home</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding home-content">
+
+  <!-- Greeting Card -->
+  <ion-card class="greeting-card">
+    <ion-card-content>
+      <h1 class="greeting-title">{{ greeting }}</h1>
+      <p class="date">{{ currentDate }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Search Card -->
+  <ion-card class="home-card">
+    <ion-card-header>
+      <ion-card-title class="search">Search for Patient</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content class="patient">
+      <ion-item>
+        <ion-label position="floating">Enter Patient Name or ID</ion-label>
+        <ion-input [(ngModel)]="patientQuery" placeholder=""></ion-input>
+      </ion-item>
+      <ion-button *ngIf="!loading" expand="full" color="primary" (click)="searchPatients(patientQuery)"
+        class="search-button">
+        Search
+      </ion-button>
+      <ion-spinner *ngIf="loading" name="crescent" class="spinner"></ion-spinner>
+
+      <ion-list class="patient-list">
+        <ion-item *ngFor="let patient of patientSearchResults">
+          <ion-label>
+            <h2>{{ patient.display }}</h2>
+            <p>{{ patient.uuid }}</p>
+          </ion-label>
+          <ion-button (click)="checkIn(patient.uuid, patient.display)" slot="end" [disabled]="patient.hasActiveVisit">
+            Check In
+          </ion-button>
+
+        </ion-item>
+      </ion-list>
+      <p *ngIf="noResults" class="no-results-message">No results match.</p>
+      <ion-button *ngIf="noResults" expand="full" (click)="goToRegistration()">Add Patient</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Vulnerability Screening Card -->
+  <ion-card class="home-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="shield-checkmark" class="icon"></ion-icon>
+        Vulnerability Screening
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="screening-content" [routerLink]="['/screened-agwy']">
+      <h3>Screened AGYW</h3>
+      <p>View screened AGYWs both eligible and ineligible</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="home-card" [routerLink]="['/service-uptake']">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="clipboard-outline" class="icon"></ion-icon>
+        Enrollment Section
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>This section documents baseline information for the Adolescent Girls and Young Women (AGYW) to assist in
+        planning for interventions.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="home-card" [routerLink]="['/screening']">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="medkit" class="icon"></ion-icon>
+        Service Uptake
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>This section enables searching an AGYW with their DREAMS ID and provides forms to offer services to the girl.
+        It consists of both service uptake and application forms.</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

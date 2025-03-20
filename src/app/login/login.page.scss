@@ -1,0 +1,132 @@
+ion-content {
+  --background: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+  margin: 0;   
+  --ion-padding-bottom: 0;
+  
+}
+
+ion-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #45257d 50%, #6f4892 50%);
+  clip-path: rhombus(0 0, 100% 0, 100% 75%, 0 100%);
+  z-index: -1;
+}
+
+.logo-container {
+  margin-top: 60px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  width: 165px;
+  height: 155px;
+  border-radius: 50%;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+}
+
+
+
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+  background: white;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.input-icon {
+  font-size: 24px;
+  color: #6f4892;
+  margin-right: 10px;
+}
+
+.input-field {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.login-button {
+  background: #45257d;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 25px;
+  margin-top: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.footer-text {
+  margin-top: 20px;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* Ensure content doesn't scroll */
+ion-content.non-scrollable {
+  position: relative;
+  height: 100vh;
+  /* Full height of the viewport */
+  overflow: hidden;
+  /* Disable scrolling */
+}
+
+ion-footer {
+  background-color: #26247B;  
+  padding: 0;  
+  width: 100%;  
+  margin-top: 0;   
+  padding: 0; 
+}
+
+.dreams-footer {
+  display: flex;
+  justify-content: flex-start;  
+  align-items: center;  
+  overflow: hidden;  
+  position: relative;
+  width: 100%;  
+}
+
+.word-box {
+  display: inline-block;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: #fff;  
+  text-align: center;
+  border-radius: 4px;
+  white-space: nowrap; 
+  margin-right: 10px; 
+  margin-bottom: 10px; 
+  animation: scrollWord 10s linear infinite;  
+}
+
+@keyframes scrollWord {
+  0% {
+    transform: translateX(100%);  
+  }
+  100% {
+    transform: translateX(-100%);  
+  }
+}

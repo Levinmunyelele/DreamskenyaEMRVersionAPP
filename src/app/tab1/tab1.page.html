@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-profileHeaders"> Eligible Programs</ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div *ngIf="loading">Loading programs...</div>
+  <div *ngIf="error">{{ error }}</div>
+
+  <div *ngIf="!loading && programmes.length === 0">
+    No eligible programs available.
+  </div>
+
+  <div *ngIf="!loading && programmes.length">
+    <!-- Card Layout -->
+    <ion-card class="program-card">
+      <ion-card-header>
+        <ion-card-title>Eligible Programs</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <table class="program-table">
+          <thead>
+            <tr>
+              <th>Program Name</th>
+              <th>Status</th>
+              <th>Enrollment Form UUID</th>
+              <th>Discontinuation Form UUID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let programme of programmes">
+              <td>{{ programme.display }}</td>
+              <td>{{ programme.enrollmentStatus }}</td>
+              <td>{{ programme.enrollmentFormUuid }}</td>
+              <td>{{ programme.discontinuationFormUuid || 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

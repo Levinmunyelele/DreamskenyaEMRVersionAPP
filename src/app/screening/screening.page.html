@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Service Uptake</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Search Bar -->
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Search By DREAMS ID OR AGYW Name</ion-label>
+        <ion-input [(ngModel)]="searchQuery"></ion-input>
+      </ion-item>
+      <ion-button expand="full" color="primary" (click)="searchPatients()">
+        <ion-icon name="search" slot="start"></ion-icon> Search
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="dots"></ion-spinner>
+  </div>
+
+  <ion-card *ngFor="let patient of patientSearchResults" (click)="viewPatient(patient)">
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="assets/girl.png" alt="Patient">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ patient.name }}</h2>
+        <p><strong>Dreams ID:</strong> {{ patient.dreamsId }}</p>
+        <p><strong>Date of Birth:</strong> {{ patient.dob }} ({{ getAge(patient.dob) }} Years)</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon> 
+    </ion-item>
+  </ion-card>
+  
+  <!-- No Results Message -->
+  <ion-text *ngIf="noResults" class="ion-text-center">
+    No patients found.
+  </ion-text>
+
+</ion-content>

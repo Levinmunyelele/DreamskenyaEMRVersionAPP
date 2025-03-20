@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add Role</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Role Name</ion-label>
+      <ion-input 
+        [(ngModel)]="role.name" 
+        placeholder="Enter role name" 
+        style="color: black; background-color: white; padding: 5px;">
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Description</ion-label>
+      <ion-textarea 
+        [(ngModel)]="role.description" 
+        placeholder="Enter description" 
+        style="color: black; background-color: white; padding: 5px;">
+      </ion-textarea>
+    </ion-item>
+    
+  </ion-list>
+
+  <ion-button expand="block" color="primary" (click)="saveRole()">Save</ion-button>
+</ion-content>
+

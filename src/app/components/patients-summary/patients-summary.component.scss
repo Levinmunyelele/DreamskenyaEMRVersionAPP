@@ -1,0 +1,84 @@
+/* Overall content styling */
+ion-content {
+    --background: #f5f5f5; /* Light gray background */
+    padding: 16px;
+  }
+  
+  /* Patient info card */
+  ion-card:first-of-type {
+    margin-bottom: 24px; /* More space below the patient info card */
+    --background: #ffffff;
+    --border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Grid and row styling */
+  ion-grid {
+    /* Optional: add a border around the grid if desired */
+    /* border: 1px solid #ddd; */
+  }
+  
+  ion-row {
+    margin-bottom: 16px; /* space between rows */
+  }
+  
+  /* Column/card styling for each section */
+  ion-col {
+    padding: 0 8px; /* horizontal padding between cards */
+  }
+  
+  ion-card {
+    --background: #ffffff;
+    --border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 8px 0;
+  }
+  
+  /* Card header and title styling */
+  ion-card-header {
+    background-color: #fafafa;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  ion-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Card content styling */
+  ion-card-content {
+    padding: 12px;
+  }
+  
+  /* List styling within cards */
+  ion-list {
+    margin: 0;
+    padding: 0;
+  }
+  
+  ion-item {
+    --min-height: 40px;
+    padding: 4px 0;
+  }
+  
+  ion-item-divider {
+    --background: #e0e0e0;
+    font-weight: bold;
+    padding: 6px 12px;
+  }
+  
+  
+  ion-list {
+    padding: 10px;
+  }
+  
+  ion-item {
+    --border-radius: 10px;
+    margin: 5px;
+    --background: white;
+    --box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  

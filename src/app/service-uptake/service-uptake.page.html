@@ -1,0 +1,149 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Service Uptake
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="uptakeForm" (ngSubmit)="submitForm()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Behavioural Interventions</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(0, 3); let i = index" class="question-container">
+
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <input type="date" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i" class="form-control" />
+            </div>
+
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i" class="form-control"></textarea>
+            </div>
+
+            <div *ngIf="!question.type">
+              <p>Unsupported question type</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Bio Medical Interventions</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(3, 6); let i = index" class="question-container">
+
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <input type="date" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i" class="form-control"></textarea>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Social Protection Interventions</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(6,9); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <input type="date" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i" class="form-control"></textarea>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Other</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions.slice(9); let i = index" class="question-container">
+            <div *ngIf="question.type === 'dropdown'">
+              <label>{{ question.label }}</label>
+              <select [formControlName]="i" class="form-control">
+                <option *ngFor="let option of question.options" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+            <div *ngIf="question.type === 'date'">
+              <label>{{ question.label }}</label>
+              <input type="date" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'text'">
+              <label>{{ question.label }}</label>
+              <input type="text" [formControlName]="i" class="form-control" />
+            </div>
+            <div *ngIf="question.type === 'textarea'">
+              <label>{{ question.label }}</label>
+              <textarea [formControlName]="i" class="form-control"></textarea>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    <button type="submit" [disabled]="uptakeForm.invalid" class="btn btn-primary mt-3">
+      Submit
+    </button>
+  </form>
+</ion-content>
