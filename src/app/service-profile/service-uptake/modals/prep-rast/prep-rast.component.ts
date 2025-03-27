@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { ModalController, NavParams } from '@ionic/angular';
+import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
+import { EncounterService } from 'src/app/services/encounter.service';
 
 @Component({
   selector: 'app-prep-rast',
@@ -11,6 +12,13 @@ import { Router } from '@angular/router';
 export class PrepRastComponent  implements OnInit {
 
   prepForm!: FormGroup;
+  patientData: any;
+  enrollmentData: any;
+  encounterData: any;
+  visitType: any;
+  encounterType: string = "";
+  form: string = "";
+  @Input() encounter: any;
 
 
   questions = [
@@ -22,7 +30,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "What is your HIV status?",
       concept: "179bb083-6f5d-4610-bee0-afe2de78f10f",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "03f86827-88a0-439c-bb49-75b06482ec3e", label: "Unwilling to Disclose" },
           { value: "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Unknown" },
@@ -33,7 +41,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "What is the HIV status of your sexual partner(s)?",
       concept: "5baca04f-dad6-4480-b01a-28de2c0599a6",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "03f86827-88a0-439c-bb49-75b06482ec3e", label: "Unwilling to Disclose" },
           { value: "1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Unknown" },
@@ -44,7 +52,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "In the past 6 months have you had sex without a condom with a partner(s) of unknown or positive HIV status?",
       concept: "bf09a3fb-63fe-47c2-9683-b9108eddd036",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -53,7 +61,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "In the past 6 months have you engaged in sex in exchange of money or other favors?",
       concept: "c6a3d529-12fa-4024-9e65-9a5eccad3861",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -62,7 +70,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "In the past 6 months have you been diagnosed with or treated for an STI?",
       concept: "f41ffdc9-dca4-4460-97af-b09152e3085d",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -71,7 +79,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "In the past 6 months have you shared needles while engaging in intravenous drug use?",
       concept: "a0277e58-2fa9-4eb4-ac75-516f6d6f1095",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -80,7 +88,7 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "In the past 6 months have you been forced to have sex against your will or physically assaulted including assault by your sexual partner(s)?",
       concept: "d045491a-cd09-4f10-9659-c4dc63141e20",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -89,14 +97,14 @@ export class PrepRastComponent  implements OnInit {
   {
       label: "Have you used post exposure prophylaxis (PEP) two times or more?",
       concept: "91cd943f-4246-4df9-af89-181f173df1c0",
-      type: "checkbox",
+      type: "radio",
       options: [
           { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
           { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
       ]
   },
   {
-      label: "Refer the client for further PrEP assessment at the health facility (Remarks):",
+      label: "Refer the client for further PrEP assessment at the health facility (Remarks)",
       concept: "4962c60f-f5cd-4426-889a-294f6a8ac72b",
       type: "text",
   },
@@ -108,7 +116,15 @@ export class PrepRastComponent  implements OnInit {
 ];
   sections: any[] | undefined;
 
-constructor(private modalCtrl: ModalController, private fb: FormBuilder, private router: Router) { }
+constructor(
+  private modalCtrl: ModalController,
+    private fb: FormBuilder,
+    private router: Router,
+    private navParams: NavParams,
+    private encounterService: EncounterService
+
+
+) { }
 
 closeModal() {
   this.modalCtrl.dismiss();
@@ -117,29 +133,141 @@ closeModal() {
 get responses(): FormArray {
   return this.prepForm.get('responses') as FormArray;
 }
+populateForm() {
+  if (!this.encounter || !this.encounter.obs) {
+    console.warn('Encounter or observations are missing, skipping form population.');
+    return;
+  }
+
+  const responsesArray = this.prepForm.get('responses') as FormArray;
+  const obs = this.encounter.obs;
+
+  obs.forEach((ob: any) => {
+    const question = this.questions.find((q) => q.concept === ob.concept.uuid);
+    if (question) {
+      const index = this.questions.indexOf(question);
+      if (index !== -1) {
+        const control = responsesArray.at(index);
+        if (control) {
+          let value = this.extractValue(ob.display);
+
+          if (question.type === 'radio' && question.options) {
+            const option = question.options.find((opt) => opt.label === value);
+            if (option) {
+              control.setValue(option.value);
+            }
+          } else if (question.type === 'date' || question.type === 'text') {
+            control.setValue(value);
+          } else {
+            control.setValue(value);
+          }
+        }
+      }
+    }
+  });
+}
+
+extractValue(display: string): string {
+  const parts = display.split('::'); // Split by '::'
+  if (parts.length > 1) {
+    return parts[1].trim(); // Get the second part
+  } else {
+    const singleColonParts = display.split(':'); // Split by ':'
+    return singleColonParts.length > 1 ? singleColonParts[1].trim() : display;
+  }
+}
+submitForm() {
+  if (!this.patientData) {
+    console.error('Patient data is missing');
+    return;
+  }
+
+  if (!this.questions || this.questions.length === 0) {
+    console.warn('No questions available, skipping form submission.');
+    return;
+  }
+
+  if (!this.responses) {
+    console.error('Responses are missing.');
+    return;
+  }
+
+  const obs = this.questions.map((question, index) => {
+    const value = this.responses.at(index)?.value;
+    return {
+      concept: question.concept,
+      value: question.type === 'dropdown' ? { uuid: value } : value
+    };
+  });
+
+  const patientUuid = this.patientData.uuid;
+  const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+  const visitUuid = this.visitType || null;
+  const encounterTypeUuid = this.encounterType || "6e5ec039-8d2a-4172-b3fb-ee9d0ba647b7";
+
+  if (!locationUuid) {
+    console.error('Location UUID is missing from patient data.');
+    return;
+  }
+
+  if (!visitUuid) {
+    console.warn('Visit UUID is missing. Setting visit to null.');
+  }
+
+  if (!this.encounterType) {
+    console.warn('Encounter Type is missing. Using default.');
+  }
+
+  const payload = {
+    patient: patientUuid,
+    visit: visitUuid,
+    encounterType: encounterTypeUuid,
+    form: this.form || "68f03464-e4cf-4336-b264-e3d43f1f123c",
+    obs: obs,
+    orders: [],
+    diagnoses: [],
+    location: locationUuid
+  };
+
+  console.log('Payload to be sent:', payload);
+
+  this.encounterService.submitEncounter(payload).subscribe(
+    (response) => {
+      console.log('API Response:', response);
+      this.modalCtrl.dismiss({ refresh: true, data: response });
+    },
+    (error) => {
+      console.error('API Error:', error);
+      this.modalCtrl.dismiss({ refresh: false, error: error });
+    }
+  );
+}
+
 
 ngOnInit() {
-  this.prepForm= this.fb.group({});
+  this.patientData = this.navParams.get('patientData');
+  this.enrollmentData = this.navParams.get('enrollmentData');
+  this.encounterData = this.navParams.get('encounterData');
+  this.visitType = this.navParams.get('visitType');
+  this.encounterType = this.navParams.get('encounterType');
+  this.form = this.navParams.get('form');
 
+  console.log("Modal Data Received:", {
+    patientData: this.patientData,
+    enrollmentData: this.enrollmentData,
+    encounterData: this.encounterData,
+    visitType: this.visitType,
+    encounterType: this.encounterType,
+    form: this.form
+  });
 
-  
-}
-
-
-
-onCheckboxChange(event: any, controlName: string) {
-  let selectedValues = this.prepForm.get(controlName)?.value || [];
-  if (event.target.checked) {
-    selectedValues.push(event.target.value);
-  } else {
-    selectedValues = selectedValues.filter((v: any) => v !== event.target.value);
+  this.prepForm = this.fb.group({
+    responses: this.fb.array(this.questions?.map(() => this.fb.control('')) || [])
+  });
+  if (this.encounter) {
+    this.populateForm();
   }
-  this.prepForm.get(controlName)?.setValue(selectedValues);
+
 }
 
-
-
-submitForm() {
-  console.log("First Form Data:", this.prepForm.value);
-}
-}
+}  

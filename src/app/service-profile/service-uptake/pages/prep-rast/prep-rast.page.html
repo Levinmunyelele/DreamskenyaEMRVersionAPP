@@ -9,19 +9,39 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-label>
-        <strong>PreP Rapid Assessment Tool (RAST)</strong>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content class="ion-padding">
+  <div class="header-container">
+    <h2 class="form-title">PreP Rapid Assessment Tool (RAST)</h2>
+  </div>
+
+  <ion-card class="service-list-card">
+    <ion-card-header>
+      <ion-card-title class="card-title">Service List</ion-card-title>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <div class="card-container">
+        <ion-card *ngFor="let encounter of encounters" class="small-card" (click)="openModal(encounter)">
+          <ion-card-content class="card-content">
+            <p class="intervention-date">
+              <strong>Service uptake offered on:</strong> 
+              {{ getInterventionDate(encounter) | date:'medium' }}
+            </p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="primary" (click)="openModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-  
 </ion-content>
+  
+
+
+
+  
+  

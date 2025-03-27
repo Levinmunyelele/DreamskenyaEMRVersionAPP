@@ -1,22 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { ModalController, NavParams } from '@ionic/angular';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { EncounterService } from 'src/app/services/encounter.service';
 
 @Component({
   selector: 'app-business-assessment',
   templateUrl: './business-assessment.component.html',
   styleUrls: ['./business-assessment.component.scss'],
 })
-export class BusinessAssessmentComponent  implements OnInit {
+export class BusinessAssessmentComponent implements OnInit {
 
   assForm!: FormGroup;
   secondFormGroup!: FormGroup;
-  thirdFormGroup!: FormGroup;
-  forthFormGroup!: FormGroup
+  patientData: any;
+  enrollmentData: any;
+  encounterData: any;
+  visitType: any;
+  encounterType: string = "";
+  form: string = "";
   currentStep = 1;
+  selectedOptions: { [key: string]: any } = {};
+  @Input() encounter: any;
 
-  
+
+
   questions = [
     {
       label: "Intervention Date",
@@ -48,13 +56,13 @@ export class BusinessAssessmentComponent  implements OnInit {
       concept: "e3b775f9-d60e-4d17-b599-b66909ed6ae2",
       type: "text"
     }
-  
+
   ];
   secondSection = [
     {
       label: "Business understanding & passion: (Determine whether AGYW understands her business well and has Passion / enthusiasm for doing it / how long in business)",
       concept: "4d0b3378-273e-4ef8-850a-bce337979446",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -76,7 +84,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Business start-up capital: (Determine how business start-up cost was arrived at & the source of capital. Probe for honesty and seek business plan for costs from 10,000/= upwards)",
       concept: "2ef00544-3c4d-4d0e-9eb2-bf289b2445b8",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -98,7 +106,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Record keeping: (Find out whether AGYW keeps business records. Seek evidence where applicable.)",
       concept: "3b0c430d-2c97-4e97-a46c-0b2869ff492e",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -120,7 +128,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: " Marketing & customer relations strategies: (Determine how the AGYW attracts and handles customers or probe for the understanding of the 4Ps or 6Ps of marketing and actual application in real life)",
       concept: "fba82ccc-1132-46a7-a2c8-c1c73682693f",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -142,7 +150,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Business costing: (Understand how AGYW sets prices for goods/ services and any factors put into consideration before selling price is determined)",
       concept: "5310763f-f54e-4700-a55a-ff457df16161",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -164,7 +172,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Profit and loss: (Determine whether AGYW knows when she makes a profit /loss. Also seek any evidence to support statements given or insinuations made)",
       concept: "e5c64470-28bd-41fe-a309-8e11ce1f0809",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -186,7 +194,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Business worth: (By observation and information provided by the AGYW, estimate the approximate value of products /services. This involves determining the approximate current net worth of the business. Look out for tangible evidence.)",
       concept: "da776cf3-a79e-4308-b834-f5e11212f6ea",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -208,7 +216,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Future plans: (Determine what AGYW intends to do in the future.)",
       concept: "616c6160-6c9a-4b0a-9d70-7c6775f310ce",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -230,7 +238,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Business viability: (Assess the potential for business growth and development in the future)",
       concept: "9e73c708-41f5-4e1d-be1f-520435d21c96",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -252,7 +260,7 @@ export class BusinessAssessmentComponent  implements OnInit {
     {
       label: "Perceived risks/ gaps:(Assess the potential business risks and gaps. This is a critical component regarding the future of the business. Rate low where perceived risks are highly likely and vice versa)",
       concept: "e850da31-2452-48de-a9b1-1c8be8633b43",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "91d95a53-fe9d-4cce-a4eb-cd4f9b45df7f", label: "10-Highest" },
         { value: "d1da8cc9-a561-4a11-a2cd-48adc1c1c4c4", label: "9" },
@@ -272,14 +280,20 @@ export class BusinessAssessmentComponent  implements OnInit {
       type: "text"
     }
 
-  
+
   ]
 
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
-  checkboxedCheckboxes: { [key: string]: string[] } = {}
-  
-  constructor(private modalCtrl: ModalController, private fb: FormBuilder, private router: Router) { }
+  radioedradioes: { [key: string]: string[] } = {}
+
+  constructor(
+    private modalCtrl: ModalController,
+    private fb: FormBuilder,
+    private router: Router,
+    private encounterService: EncounterService,
+    private navParams: NavParams,
+  ) { }
 
   closeModal() {
     this.modalCtrl.dismiss();
@@ -292,35 +306,101 @@ export class BusinessAssessmentComponent  implements OnInit {
   ngOnInit() {
     this.assForm = this.fb.group({});
     this.secondFormGroup = this.fb.group({});
-    
+
 
     this.sections = [
       { questions: this.questions, formGroup: this.assForm },
       { questions: this.secondSection, formGroup: this.secondFormGroup },
-    
+
 
     ];
     this.totalSteps = this.sections.length;
 
     this.sections.forEach(({ questions, formGroup }) => {
       questions.forEach((question) => {
-        if (question.type === "checkbox") {
+        if (question.type === "radio") {
           formGroup.addControl(question.concept, this.fb.control([]));
         } else {
           formGroup.addControl(question.concept, this.fb.control(""));
         }
       });
     });
+    this.patientData = this.navParams.get('patientData');
+    this.enrollmentData = this.navParams.get('enrollmentData');
+    this.encounterData = this.navParams.get('encounterData');
+    this.visitType = this.navParams.get('visitType');
+    this.encounterType = this.navParams.get('encounterType');
+    this.form = this.navParams.get('form');
+
+    console.log("Modal Data Received:", {
+      patientData: this.patientData,
+      enrollmentData: this.enrollmentData,
+      encounterData: this.encounterData,
+      visitType: this.visitType,
+      encounterType: this.encounterType,
+      form: this.form
+    });
+
+    if (this.encounter) {
+      this.populateForm();
+    }
   }
 
-  onCheckboxChange(event: any, controlName: string) {
-    let checkboxedValues = this.assForm.get(controlName)?.value || [];
-    if (event.target.checked) {
-      checkboxedValues.push(event.target.value);
-    } else {
-      checkboxedValues = checkboxedValues.filter((v: any) => v !== event.target.value);
+  onSelectionChange(value: any, concept: string) {
+    this.selectedOptions[concept] = value;
+
+    const index = this.questions.findIndex(q => q.concept === concept);
+    if (index !== -1) {
+      const responsesArray = this.assForm.get('responses') as FormArray;
+      responsesArray.at(index).setValue(value);
     }
-    this.assForm.get(controlName)?.setValue(checkboxedValues);
+  }
+  populateForm() {
+    if (!this.encounter || !this.encounter.obs) {
+      console.warn('Encounter or observations are missing, skipping form population.');
+      return;
+    }
+  
+    const obs = this.encounter.obs;
+  
+    obs.forEach((ob: any) => {
+      this.sections.forEach((section) => {
+        const question = section.questions.find((q) => q.concept === ob.concept.uuid) as {
+          label: string;
+          concept: string;
+          type: string;
+          options?: { label: string; value: any }[];
+        };
+  
+        if (question) {
+          const formGroup = section.formGroup;
+          if (formGroup) {
+            let value = this.extractValue(ob.display);
+  
+            if (question.type === 'radio' && question.options) {
+              const option = question.options.find((opt) => opt.label === value);
+              if (option) {
+                formGroup.get(question.concept)?.setValue(option.value);
+              }
+            } else if (question.type === 'date' || question.type === 'text' || question.type === 'number' || question.type === 'textarea' || question.type === 'dropdown') {
+              formGroup.get(question.concept)?.setValue(value);
+            } else {
+              formGroup.get(question.concept)?.setValue(value);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  extractValue(display: string): string {
+    const parts = display.split('::'); // Split by '::'
+    if (parts.length > 1) {
+      return parts[1].trim(); // Get the second part
+    } else {
+      const singleColonParts = display.split(':'); // Split by ':'
+      return singleColonParts.length > 1 ? singleColonParts[1].trim() : display;
+    }
   }
 
   nextStep() {
@@ -336,8 +416,81 @@ export class BusinessAssessmentComponent  implements OnInit {
   }
 
   submitForm() {
-    console.log("First Form Data:", this.assForm.value);
-    console.log("Second Form Data:", this.secondFormGroup.value);
-  }
-}
+    if (!this.patientData) {
+      console.error('Patient data is missing');
+      return;
+    }
 
+    if (!this.questions || !this.secondSection) {
+      console.warn('One or more question sections are missing, skipping form submission.');
+      return;
+    }
+
+    if (!this.assForm || !this.secondFormGroup) {
+      console.error('One or more form groups are missing.');
+      return;
+    }
+
+
+    const extractObs = (questions: any[], formGroup: any) => {
+      return questions
+        .map((question) => {
+          let value = formGroup.value[question.concept];
+
+          if (value !== null && value !== undefined && value !== '') {
+            if (['dropdown', 'radio'].includes(question.type)) {
+              return { concept: question.concept, value: value };
+            }
+            if (['text', 'textarea'].includes(question.type)) {
+              return { concept: question.concept, value: value };
+            }
+
+            if (question.type === 'number') {
+              return { concept: question.concept, value: value };
+            }
+
+            if (question.type === 'date') {
+              return { concept: question.concept, value: value };
+            }
+
+            return { concept: question.concept, value };
+          }
+
+          return null;
+        })
+        .filter(Boolean)
+    };
+
+
+
+    const obs = [
+      ...extractObs(this.questions, this.assForm),
+      ...extractObs(this.secondSection, this.secondFormGroup),
+
+    ];
+
+    const payload = {
+      patient: this.patientData.uuid,
+      visit: this.visitType || null,
+      encounterType: this.encounterType,
+      form: this.form,
+      obs: obs,
+      orders: [],
+      diagnoses: [],
+      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+    };
+
+    console.log('Payload to be sent:', payload);
+
+    this.encounterService.submitEncounter(payload).subscribe(
+      (response) => {
+        console.log('API Response:', response);
+        this.modalCtrl.dismiss({ refresh: true, data: response });
+      },
+      (error) => {
+        console.error('API Error:', error);
+        this.modalCtrl.dismiss({ refresh: false, error: error });
+      }
+    );
+  }
+}  

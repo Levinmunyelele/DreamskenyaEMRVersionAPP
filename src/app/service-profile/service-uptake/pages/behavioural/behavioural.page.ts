@@ -17,6 +17,9 @@ export class BehaviouralPage implements OnInit {
   encounterType: string = "";
   form: string = "";
   encounters: any[] = [];
+  interventionDisplay = 'DREAMS Behavioural Intervention';
+  
+
 
   constructor(
     private navCtrl: NavController,
@@ -30,7 +33,7 @@ export class BehaviouralPage implements OnInit {
     this.navCtrl.back();
   }
 
-  async openModal() {
+  async openModal(encounter?: any) {
     const modal = await this.modalCtrl.create({
       component: BehaviouralModalPage,
       cssClass: 'popup-modal',
@@ -41,14 +44,20 @@ export class BehaviouralPage implements OnInit {
         encounterData: this.encounterData,
         visitType: this.visitType,
         encounterType: this.encounterType,
-        form: this.form
+        form: this.form,
+        encounter: encounter
+
       }
     });
-    
+  
     modal.onDidDismiss().then((result) => {
       if (result.data) {
         console.log('Response from modal:', result.data);
-        this.updateEncounterDetails(result.data);
+        if (result.data.refresh) {
+          this.fetchEncounters();
+        } else {
+          this.updateEncounterDetails(result.data); 
+        }
       }
     });
   
@@ -60,15 +69,23 @@ export class BehaviouralPage implements OnInit {
   }
   
   getIntervention(obs: any[]): string {
-    const intervention = obs.find(o => o.display.includes('DREAMS Behavioural Intervention'));
-    return intervention ? intervention.display : 'No Behavioural Intervention';
+    const intervention = obs.find(o => o.display.includes(this.interventionDisplay));
+    if (intervention) {
+      const parts = intervention.display.split(':');
+      if (parts.length > 1) {
+        return parts.slice(1).join(':').trim();
+      } else {
+        return 'No intervention details found';
+      }
+    } else {
+      return `No ${this.interventionDisplay}`;
+    }
   }
   
   getInterventionDate(obs: any[]): string {
     const interventionDate = obs.find(o => o.display.includes('DREAMS Intervention Date'));
     return interventionDate ? interventionDate.obsDatetime : 'No Date Available';
   }
-  
   
   fetchEncounters() {
     if (!this.patientData?.uuid || !this.encounterType) {
@@ -79,9 +96,13 @@ export class BehaviouralPage implements OnInit {
     this.encounterService.getEncounters(this.patientData.uuid, this.encounterType).subscribe(
       (encounters) => {
         if (encounters.length > 0) {
-          this.encounters = encounters;
-          console.log("Fetched Encounters:", this.encounters);
+          this.encounters = encounters.filter(encounter => {
+            return encounter.obs && encounter.obs.some((obs: { display: string | string[]; }) => obs.display.includes(this.interventionDisplay));
+          });
+  
+          console.log("Fetched and Filtered Encounters:", this.encounters);
         } else {
+          this.encounters = [];
           console.log("No encounters found for this patient.");
         }
       },

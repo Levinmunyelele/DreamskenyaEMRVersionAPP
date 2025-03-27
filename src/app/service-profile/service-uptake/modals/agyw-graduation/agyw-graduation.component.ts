@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { ModalController, NavParams } from '@ionic/angular';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { EncounterService } from 'src/app/services/encounter.service';
 
 
 @Component({
@@ -13,14 +14,22 @@ export class AgywGraduationComponent implements OnInit {
   gradForm!: FormGroup;
   secondFormGroup!: FormGroup;
   thirdFormGroup!: FormGroup;
-  forthFormGroup!: FormGroup
   currentStep = 1;
+  patientData: any;
+  enrollmentData: any;
+  encounterData: any;
+  visitType: any;
+  encounterType: string = "";
+  form: string = "";
+  selectedOptions: { [key: string]: any } = {};
+  @Input() encounter: any;
+
 
   questions = [
     {
       label: "AGYW Ageband",
       concept: "e4191d15-7641-4e20-ab7a-727844dcf9f7",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "9b94ba22-dfc9-44e9-a7e7-d3f43fb4cf2c", label: "20-24" },
         { value: "903151cb-14a9-4399-8afc-e6c4f70402eb", label: "18-19" },
@@ -29,30 +38,30 @@ export class AgywGraduationComponent implements OnInit {
       ]
     },
     {
-      label: "checkbox Primary Individual Interventions AGYW received",
+      label: "Primary Individual Interventions AGYW received",
       concept: "01aad1dd-c557-4b20-951b-a48af0e66ef5",
       type: "checkbox",
       options: [
         { value: "3f680472-7923-49fa-9392-66a9694a02d1", label: "Social Asset Building" },
         { value: "669e777e-292b-4753-8ef8-747eff38a483", label: "SHUGA II" },
         { value: "8f7f4fb7-bc07-4a25-ac0c-0c54ccff15b6", label: "Sexual Violence - STI Screening" },
-        { value: "02bfe351-f17b-4685-aa21-12a0a42ab998", label: "PrEP - PrEP Education" },
+        { value: "02bfe351-f17b-4685-aa21-12a0a42ab998", label: "PrEP - PrEP gradcation" },
         { value: "9ae2f8d3-6a30-4b1d-b42c-4099464d798d", label: "HTS Screening" },
         { value: "882116be-158d-470d-81e4-4afecd0c8e14", label: "HTS - Screening and Eligibility (Client)" },
         { value: "c5237306-936e-4825-ab71-d32f4dfc7e47", label: "HTS - HTS (Client)" },
         { value: "daba45c8-8b3e-476a-9115-e443a34fed96", label: "HTS - Client Linked to HTS" },
         { value: "586ce4a3-3c60-4cea-ae75-017a938e4450", label: "Health Choices for a Better Future (HCBF or Healthy Choices1)" },
-        { value: "245b2643-7a2b-4906-9aec-f047a038f4e9", label: "FP - Contraception Method Mix - Education/Info" },
+        { value: "245b2643-7a2b-4906-9aec-f047a038f4e9", label: "FP - Contraception Method Mix - gradcation/Info" },
         { value: "9366a010-6aea-48e7-8a87-1c50403db1b7", label: "Economic Strengthening - Financial Capabilities Training" },
         { value: "6195e7e6-448f-46bc-9a65-90ccd63e1941", label: "Economic Strengthening - Entrepreneurship training" },
         { value: "35151086-738f-4c15-afd1-7b085987efdb", label: "EBI-Respect K" },
         { value: "c6d18fd8-e96c-4b55-8ca5-626a5252f9da", label: "EBI - SISTER TO SISTER-K" },
-        { value: "c91622c8-9dbe-46ac-89dd-133945463c2c", label: "Condom education/demonstration" },
+        { value: "c91622c8-9dbe-46ac-89dd-133945463c2c", label: "Condom gradcation/demonstration" },
         { value: "fda6d351-f810-4a5b-9d45-6ad162542944", label: "Attended" }
       ]
     },
     {
-      label: "checkbox Secondary Individual Interventions AGYW received",
+      label: "Secondary Individual Interventions AGYW received",
       concept: "a02d5213-9422-477d-8abf-551ea9006c34",
       type: "checkbox",
       options: [
@@ -116,9 +125,9 @@ export class AgywGraduationComponent implements OnInit {
         { value: "458c0121-27cc-4e82-8286-0855faa39171", label: "Emotional Violence - Legal Aid" },
         { value: "ebc105b8-0f7b-4c02-8f08-4a41517d361e", label: "Emotional Violence - Examination/Treatment of injuries" },
         { value: "80096e09-67ac-4bd5-a202-3cb3533225d5", label: "Emotional Violence - Enrolled into Support group" },
-        { value: "c67a523f-754d-461f-bbfc-37fdc391a538", label: "Education Support - Uniform" },
-        { value: "c5ea9819-7404-45b8-9640-dc7e8fad89d7", label: "Education Support - School Fees" },
-        { value: "af4a5381-cb07-47c6-9253-93f479d2a30c", label: "Education Support - Other" },
+        { value: "c67a523f-754d-461f-bbfc-37fdc391a538", label: "gradcation Support - Uniform" },
+        { value: "c5ea9819-7404-45b8-9640-dc7e8fad89d7", label: "gradcation Support - School Fees" },
+        { value: "af4a5381-cb07-47c6-9253-93f479d2a30c", label: "gradcation Support - Other" },
         { value: "45265804-2000-40ab-ad21-6aeec5a2fbac", label: "Economic Strengthening - Vocational Training" },
         { value: "b8bcd37d-0596-4279-a34a-3679021af45d", label: "Economic Strengthening - Paid Internship" },
         { value: "f7034c1d-cce3-4a2c-80b5-213d4baeb8f1", label: "Economic Strengthening - Microfinance" },
@@ -132,9 +141,9 @@ export class AgywGraduationComponent implements OnInit {
 
   secondSection = [
     {
-      label: "Has AGYW received Violence Prevention education?",
+      label: "Has AGYW received Violence Prevention gradcation?",
       concept: "6a7ff9a6-d03f-42e5-9002-3be5414f6bfc",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -143,7 +152,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Screened for GBV during assessment for graduation?",
       concept: "32f20608-8765-467a-8635-bcb8c2e4f3ed",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -152,7 +161,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Experiencing GBV",
       concept: "238dc729-7ce8-4bd9-afad-4b88f6326687",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -161,7 +170,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Does AGYW have (or identified) a source of income?",
       concept: "d93d8cb5-f0d0-4655-a3c0-0728db6b8764",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -170,7 +179,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Does AGYW belong to a savings group or ’Chama’?",
       concept: "535dd724-ea52-42f0-8628-b85dd0a4440a",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -179,16 +188,16 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Does AGYW have the National Identification Card?",
       concept: "8c94bde9-f746-4e89-b0b9-17e0479ab25b",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
       ]
     },
     {
-      label: "Has AGYW completed secondary education?",
+      label: "Has AGYW completed secondary gradcation?",
       concept: "24854944-edbf-4370-870f-613af523b0db",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -197,7 +206,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Can she discuss HIV prevention with sexual partner(s)?",
       concept: "fbdc0fb3-3d13-488e-98f2-e31bd9f4149e",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -206,7 +215,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Knows where to get PrEP, condoms, FP, STI treatment?",
       concept: "81845c9e-899a-49ce-be2a-4c31beb700ec",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -215,7 +224,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Able to identify and avoid violence in her relationships?",
       concept: "e6d04a6c-0650-42bd-82ac-b075bc1ff411",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -224,7 +233,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Has at least 5 friends in her age group?",
       concept: "7d7b5ed3-63ed-4345-a63d-ecdfaf28cae0",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -233,7 +242,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Has an older mentor she can always refer to for help?",
       concept: "b2b2938c-6fa9-4c1b-a3cf-4822990e9ff3",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -250,7 +259,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Does AGYW wish to continue coming to the safe space",
       concept: "bf746545-8d66-4f1c-bfa0-3a7219f9d1f9",
-      type: "checkbox",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -276,7 +285,7 @@ export class AgywGraduationComponent implements OnInit {
     {
       label: "Is the AGYW Ready to be graduated?",
       concept: "733ec56f-cdd6-4043-805a-86d8d2e5c6a1",
-      type: "select",
+      type: "radio",
       options: [
         { value: "1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "Yes" },
         { value: "1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", label: "No" }
@@ -307,7 +316,13 @@ export class AgywGraduationComponent implements OnInit {
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
 
-  constructor(private modalCtrl: ModalController, private fb: FormBuilder, private router: Router) { }
+  constructor(
+    private modalCtrl: ModalController,
+    private fb: FormBuilder,
+    private router: Router,
+    private encounterService: EncounterService,
+    private navParams: NavParams,
+  ) { }
 
   closeModal() {
     this.modalCtrl.dismiss();
@@ -330,29 +345,95 @@ export class AgywGraduationComponent implements OnInit {
     ];
     this.totalSteps = this.sections.length;
 
-    this.sections.forEach(({ questions, formGroup }) => {
-      questions.forEach((question) => {
-        if (question.type === "checkbox") {
-          formGroup.addControl(question.concept, this.fb.control([]));
-        } else {
-          formGroup.addControl(question.concept, this.fb.control(""));
+    this.sections.forEach((section) => {
+      section.questions?.forEach((question) => {
+        if (question.concept) {
+          if (question.type === 'checkbox') {
+            if (!section.formGroup.contains(question.concept)) {
+              section.formGroup.addControl(question.concept, this.fb.array([]));
+            }
+
+          } else {
+            section.formGroup.addControl(question.concept, this.fb.control(''));
+          }
+
         }
+
       });
+
     });
-  }
+    this.patientData = this.navParams.get('patientData');
+    this.enrollmentData = this.navParams.get('enrollmentData');
+    this.encounterData = this.navParams.get('encounterData');
+    this.visitType = this.navParams.get('visitType');
+    this.encounterType = this.navParams.get('encounterType');
+    this.form = this.navParams.get('form');
+    console.log('Modal Data Received:', {
+      patientData: this.patientData,
+      enrollmentData: this.enrollmentData,
+      encounterData: this.encounterData,
+      visitType: this.visitType,
+      encounterType: this.encounterType,
+      form: this.form,
 
+    });
 
-
-  onCheckboxChange(event: any, controlName: string) {
-    let checkboxedValues = this.gradForm.get(controlName)?.value || [];
-    if (event.target.checked) {
-      checkboxedValues.push(event.target.value);
-    } else {
-      checkboxedValues = checkboxedValues.filter((v: any) => v !== event.target.value);
+    if (this.encounter) {
+      this.populateForm();
     }
-    this.gradForm.get(controlName)?.setValue(checkboxedValues);
+
   }
 
+  onSelectionChange(value: any, concept: string) {
+    this.selectedOptions[concept] = value;
+
+    const index = this.questions.findIndex(q => q.concept === concept);
+    if (index !== -1) {
+      const responsesArray = this.gradForm.get('responses') as FormArray;
+      responsesArray.at(index).setValue(value);
+    }
+  }
+
+  onCheckboxChange(event: any, concept: string, value: string): void {
+    const isChecked = event.detail.checked;
+
+    let targetFormGroup: FormGroup | undefined = this.gradForm.contains(concept)
+      ? this.gradForm
+      : this.thirdFormGroup.contains(concept)
+        ? this.thirdFormGroup
+        : undefined;
+
+    if (!targetFormGroup) {
+      console.error(`Control '${concept}' not found in any form group.`);
+      return;
+    }
+
+    let control = targetFormGroup.get(concept);
+
+    if (!control) {
+      console.warn(`Control '${concept}' not found in ${targetFormGroup}.`);
+      return;
+    }
+
+    if (!(control instanceof FormArray)) {
+      console.warn(`Control '${concept}' is not a FormArray. Initializing as FormArray.`);
+      targetFormGroup.setControl(concept, this.fb.array([]));
+      control = targetFormGroup.get(concept) as FormArray;
+    }
+
+    if (isChecked) {
+      if (!control.value.includes(value)) {
+        (control as FormArray).push(this.fb.control(value));
+      }
+    } else {
+      const index = (control as FormArray).controls.findIndex((x) => x.value === value);
+      if (index > -1) {
+        (control as FormArray).removeAt(index);
+      }
+    }
+
+    console.log(`Updated FormArray for concept '${concept}':`, control.value);
+  }
   nextStep() {
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
@@ -364,9 +445,157 @@ export class AgywGraduationComponent implements OnInit {
       this.currentStep--;
     }
   }
+  populateForm() {
+    if (!this.encounter || !this.encounter.obs) {
+      console.warn('Encounter or observations are missing, skipping form population.');
+      return;
+    }
+  
+    const obs = this.encounter.obs;
+  
+    obs.forEach((ob: any) => {
+      const conceptUuid = ob.concept.uuid;
+      const value = this.extractValue(ob.display);
+  
+      let question: any = this.questions.find((q) => q.concept === conceptUuid);
+      let formGroup = this.gradForm;
+  
+      if (!question) {
+        question = this.secondSection.find((q) => q.concept === conceptUuid);
+        formGroup = this.secondFormGroup;
+      }
+  
+      if (!question) {
+        question = this.thirdSection.find((q) => q.concept === conceptUuid);
+        formGroup = this.thirdFormGroup;
+      }
+  
+      if (question && formGroup) {
+        const control = formGroup.get(question.concept);
+        if (control) {
+          if (question.type === 'radio' && question.options) {
+            const option = question.options.find((opt: any) => opt.label === value);
+            if (option) {
+              control.setValue(option.value);
+            }
+          } else if (question.type === 'checkbox' && question.options) {
+            try {
+              const savedValues = JSON.parse(value);
+              if (Array.isArray(savedValues)) {
+                control.setValue(savedValues);
+              } else {
+                console.warn(`Saved value for ${question.concept} is not an array: ${value}`);
+              }
+            } catch (e) {
+              console.warn(`Saved value for ${question.concept} is not valid JSON: ${value}`);
+              control.setValue([]);
+            }
+          } else if (question.type === 'date' || question.type === 'text') {
+            control.setValue(value);
+          }
+        }
+      }
+    });
+  }
+  
+  extractValue(display: string): string {
+    const parts = display.split('::');
+    if (parts.length > 1) {
+      return parts[1].trim();
+    } else {
+      const singleColonParts = display.split(':');
+      return singleColonParts.length > 1 ? singleColonParts[1].trim() : display;
+    }
+  }
 
   submitForm() {
-    console.log("First Form Data:", this.gradForm.value);
-    console.log("Second Form Data:", this.secondFormGroup.value);
+    if (!this.patientData) {
+      console.error('Patient data is missing');
+      return;
+    }
+
+    if (!this.questions || !this.secondSection || !this.thirdSection) {
+      console.warn('One or more question sections are missing, skipping form submission.');
+      return;
+    }
+
+    if (!this.gradForm || !this.secondFormGroup || !this.thirdFormGroup) {
+      console.error('One or more form groups are missing.');
+      return;
+    }
+
+
+    const extractObs = (questions: any[], formGroup: any) => {
+      return questions
+        .map((question) => {
+          let value = formGroup.value[question.concept];
+
+          if (value !== null && value !== undefined && value !== '') {
+            if (['dropdown', 'radio'].includes(question.type)) {
+              return { concept: question.concept, value: value };
+            }
+            if (['text', 'textarea'].includes(question.type)) {
+              return { concept: question.concept, value: value };
+            }
+
+
+            if (question.type === 'number') {
+              return { concept: question.concept, value: value };
+            }
+
+            if (question.type === 'date') {
+              return { concept: question.concept, value: value };
+            }
+
+            if (question.type === 'checkbox') {
+              const control = formGroup.get(question.concept) as FormArray;
+              value = control?.value || [];
+
+              return value.map((v: string) => ({
+                concept: question.concept,
+                value: v
+              }));
+            }
+
+            return { concept: question.concept, value };
+          }
+
+          return null;
+        })
+        .filter(Boolean)
+        .reduce((acc, curr) => acc.concat(curr), []);
+    };
+
+
+
+    const obs = [
+      ...extractObs(this.questions, this.gradForm),
+      ...extractObs(this.secondSection, this.secondFormGroup),
+      ...extractObs(this.thirdSection, this.thirdFormGroup),
+    ];
+
+    const payload = {
+      patient: this.patientData.uuid,
+      visit: this.visitType || null,
+      encounterType: this.encounterType,
+      form: this.form,
+      obs: obs,
+      orders: [],
+      diagnoses: [],
+      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+    };
+
+    console.log('Payload to be sent:', payload);
+
+    this.encounterService.submitEncounter(payload).subscribe(
+      (response) => {
+        console.log('API Response:', response);
+        this.modalCtrl.dismiss({ refresh: true, data: response });
+      },
+      (error) => {
+        console.error('API Error:', error);
+        this.modalCtrl.dismiss({ refresh: false, error: error });
+      }
+    );
   }
-}
+}  

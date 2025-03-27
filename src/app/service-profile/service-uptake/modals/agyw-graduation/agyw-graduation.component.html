@@ -2,7 +2,9 @@
   <ion-toolbar class="toolbar">
     <ion-title>AGYW Graduation Scorecard</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" color="light" (click)="closeModal()">Close</ion-button>
+      <ion-button fill="clear" color="light" (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -14,39 +16,52 @@
         <ion-card-header>
           <ion-card-title>{{ question.label }}</ion-card-title>
         </ion-card-header>
-        
+
         <ion-card-content>
 
-            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text" formControlName="{{ question.concept }}"></ion-input>
-          
+          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+            formControlName="{{ question.concept }}"></ion-input>
 
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date" formControlName="{{ question.concept }}" />
+
+          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+            formControlName="{{ question.concept }}" />
           <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines = 'none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
+            <ion-item lines="none" *ngFor="let option of question.options">
+              <ion-checkbox slot="start" [checked]="gradForm.get(question.concept)?.value?.includes(option.value)"
+                (ionChange)="onCheckboxChange($event, question.concept, option.value)">
+              </ion-checkbox>
               <ion-label>{{ option.label }}</ion-label>
             </ion-item>
           </ion-list>
 
-  
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group formControlName="{{ question.concept }}">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-radio slot="start" [value]="option.value"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
         </ion-card-content>
       </ion-card>
 
       <ion-button class="left-button" (click)="nextStep()">Next</ion-button>
     </form>
   </div>
-  
+
   <div *ngIf="currentStep === 2">
     <form [formGroup]="secondFormGroup">
       <ion-card *ngFor="let question of secondSection">
         <ion-card-header>
           <ion-card-title>{{ question.label }}</ion-card-title>
         </ion-card-header>
-        
-        <ion-card-content>
-          <input class="custom-input"*ngIf="question.type === 'date'" type="date" formControlName="{{ question.concept }}" />
 
-          <ion-input class="custom-input"  *ngIf="question.type === 'text'" type="text" formControlName="{{ question.concept }}"></ion-input>
+        <ion-card-content>
+          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+            formControlName="{{ question.concept }}" />
+
+          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+            formControlName="{{ question.concept }}"></ion-input>
 
           <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
             <ion-select-option *ngFor="let option of question.options" [value]="option.value">
@@ -55,10 +70,21 @@
           </ion-select>
 
           <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines = 'none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
+            <ion-item lines="none" *ngFor="let option of question.options">
+              <ion-checkbox slot="start" [checked]="gradForm.get(question.concept)?.value?.includes(option.value)"
+                (ionChange)="onCheckboxChange($event, question.concept, option.value)">
+              </ion-checkbox>
               <ion-label>{{ option.label }}</ion-label>
             </ion-item>
+          </ion-list>
+
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group formControlName="{{ question.concept }}">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-radio slot="start" [value]="option.value"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
           </ion-list>
         </ion-card-content>
       </ion-card>
@@ -66,7 +92,7 @@
         <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
         <ion-button class="right-button" (click)="nextStep()">Next</ion-button>
       </div>
-      
+
 
     </form>
   </div>
@@ -76,11 +102,13 @@
         <ion-card-header>
           <ion-card-title>{{ question.label }}</ion-card-title>
         </ion-card-header>
-        
-        <ion-card-content>
-          <input class="custom-input"*ngIf="question.type === 'date'" type="date" formControlName="{{ question.concept }}" />
 
-          <ion-input  class="custom-input"  *ngIf="question.type === 'text'" type="text" formControlName="{{ question.concept }}"></ion-input>
+        <ion-card-content>
+          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+            formControlName="{{ question.concept }}" />
+
+          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+            formControlName="{{ question.concept }}"></ion-input>
 
           <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
             <ion-select-option *ngFor="let option of question.options" [value]="option.value">
@@ -89,10 +117,21 @@
           </ion-select>
 
           <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines = 'none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
+            <ion-item lines="none" *ngFor="let option of question.options">
+              <ion-checkbox slot="start" [checked]="gradForm.get(question.concept)?.value?.includes(option.value)"
+                (ionChange)="onCheckboxChange($event, question.concept, option.value)">
+              </ion-checkbox>
               <ion-label>{{ option.label }}</ion-label>
             </ion-item>
+          </ion-list>
+
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group formControlName="{{ question.concept }}">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-radio slot="start" [value]="option.value"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
           </ion-list>
         </ion-card-content>
       </ion-card>
@@ -100,7 +139,7 @@
         <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
         <ion-button class="right-button" type="submit" (click)="submitForm()">Submit</ion-button>
       </div>
-      
+
     </form>
   </div>
 </ion-content>

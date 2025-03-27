@@ -21,6 +21,7 @@ export class BioMedicalPage implements OnInit {
   encounterType: string = "";
   form: string = "";
   encounters: any[] = [];
+  interventionDisplay = 'DREAMS Bio Medical Interventions';
 
 
   constructor(private navCtrl: NavController,
@@ -34,15 +35,83 @@ export class BioMedicalPage implements OnInit {
     this.navCtrl.back();
   }
 
-  async openModal() {
-    const modal = await this.modalCtrl.create({
-      component: BiomedicalModalPage,
-      cssClass: 'popup-modal',
-      backdropDismiss: true,
-    });
-
-    return await modal.present();
-  }
+   async openModal(encounter?: any) {
+      const modal = await this.modalCtrl.create({
+        component: BiomedicalModalPage,
+        cssClass: 'popup-modal',
+        backdropDismiss: true,
+        componentProps: {
+          patientData: this.patientData,
+          enrollmentData: this.enrollmentData,
+          encounterData: this.encounterData,
+          visitType: this.visitType,
+          encounterType: this.encounterType,
+          form: this.form,
+          encounter: encounter
+        }
+      });
+    
+      modal.onDidDismiss().then((result) => {
+        if (result.data) {
+          console.log('Response from modal:', result.data);
+          if (result.data.refresh) {
+            this.fetchEncounters();
+          } else {
+            this.updateEncounterDetails(result.data); 
+          }
+        }
+      });
+    
+      await modal.present();
+    }
+    
+    updateEncounterDetails(response: any) {
+      this.encounterData = response;
+    }
+    
+    getIntervention(obs: any[]): string {
+      const intervention = obs.find(o => o.display.includes(this.interventionDisplay));
+      if (intervention) {
+        const parts = intervention.display.split(':');
+        if (parts.length > 1) {
+          return parts.slice(1).join(':').trim();
+        } else {
+          return 'No intervention details found';
+        }
+      } else {
+        return `No ${this.interventionDisplay}`;
+      }
+    }
+    
+    getInterventionDate(obs: any[]): string {
+      const interventionDate = obs.find(o => o.display.includes('DREAMS Intervention Date'));
+      return interventionDate ? interventionDate.obsDatetime : 'No Date Available';
+    }
+    
+    fetchEncounters() {
+      if (!this.patientData?.uuid || !this.encounterType) {
+        console.warn("Missing patient UUID or encounter type");
+        return;
+      }
+    
+      this.encounterService.getEncounters(this.patientData.uuid, this.encounterType).subscribe(
+        (encounters) => {
+          if (encounters.length > 0) {
+            this.encounters = encounters.filter(encounter => {
+              return encounter.obs && encounter.obs.some((obs: { display: string | string[]; }) => obs.display.includes(this.interventionDisplay));
+            });
+    
+            console.log("Fetched and Filtered Encounters:", this.encounters);
+          } else {
+            this.encounters = [];
+            console.log("No encounters found for this patient.");
+          }
+        },
+        (error) => {
+          console.error("Error fetching encounters:", error);
+        }
+      );
+    }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -64,7 +133,6 @@ export class BioMedicalPage implements OnInit {
       if (params['form']) {
         this.form = params['form'];
       }
-
       console.log("Received Data in Behavioural Page:", {
         patientData: this.patientData,
         enrollmentData: this.enrollmentData,
@@ -74,6 +142,9 @@ export class BioMedicalPage implements OnInit {
         form: this.form
       });
     });
+
+    this.fetchEncounters();
+    
+
   }
 }
-

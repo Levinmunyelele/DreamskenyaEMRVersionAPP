@@ -1,10 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, Input, OnInit } from '@angular/core';
+import { ModalController, NavParams } from '@ionic/angular';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
-
-
-
+import { EncounterService } from 'src/app/services/encounter.service';
 
 
 @Component({
@@ -14,6 +12,13 @@ import { Router } from '@angular/router';
 })
 export class BiomedicalModalPage implements OnInit {
   biomedicalForm!: FormGroup;
+  patientData: any;
+  enrollmentData: any;
+  encounterData: any;
+  visitType: any;
+  encounterType: string = "";
+  form: string = "";
+  @Input() encounter: any;
 
   questions = [
 
@@ -38,11 +43,63 @@ export class BiomedicalModalPage implements OnInit {
 
     },
   ]
-  constructor(private modalCtrl: ModalController,
+  constructor(
+    private modalCtrl: ModalController,
     private fb: FormBuilder,
-    private router: Router
-  ) { }
+    private router: Router,
+    private encounterService: EncounterService,
+    private navParams: NavParams,
 
+
+  ) { }
+  populateForm() {
+    if (!this.encounter || !this.encounter.obs) {
+      console.warn('Encounter or observations are missing, skipping form population.');
+      return;
+    }
+
+    const responsesArray = this.biomedicalForm.get('responses') as FormArray;
+    const obs = this.encounter.obs;
+
+    obs.forEach((ob: any) => {
+      const question = this.questions.find((q) => q.concept === ob.concept.uuid);
+      if (question) {
+        const index = this.questions.indexOf(question);
+        if (index !== -1) {
+          const control = responsesArray.at(index);
+          if (control) {
+            let value = this.extractValue(ob.display);
+
+            if (question.type === 'radio' && question.options) {
+              const option = question.options.find((opt) => opt.label === value);
+              if (option) {
+                control.setValue(option.value);
+              }
+            } else if (question.type === 'dropdown' && question.options) { // Add this condition for 'select'
+              const option = question.options.find((opt) => opt.label === value);
+              if (option) {
+                control.setValue(option.value);
+              }
+            } else if (question.type === 'date' || question.type === 'text') {
+              control.setValue(value);
+            } else {
+              control.setValue(value);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  extractValue(display: string): string {
+    const parts = display.split('::');
+    if (parts.length > 1) {
+      return parts[1].trim();
+    } else {
+      const singleColonParts = display.split(':');
+      return singleColonParts.length > 1 ? singleColonParts[1].trim() : display;
+    }
+  }
   closeModal() {
     this.modalCtrl.dismiss();
   }
@@ -52,41 +109,95 @@ export class BiomedicalModalPage implements OnInit {
   }
 
   submitForm() {
+    if (!this.patientData) {
+      console.error('Patient data is missing');
+      return;
+    }
+
+    if (!this.questions || this.questions.length === 0) {
+      console.warn('No questions available, skipping form submission.');
+      return;
+    }
+
+    if (!this.responses) {
+      console.error('Responses are missing.');
+      return;
+    }
+
     const obs = this.questions.map((question, index) => {
-      const value = this.responses.at(index).value;
-      if (question.type === 'dropdown') {
-        return {
-          concept: { uuid: question.concept },
-          value: { uuid: value }
-        };
-      } else {
-        return {
-          concept: { uuid: question.concept },
-          value: value
-        };
+      const value = this.responses.at(index)?.value;
+      return {
+        concept: question.concept,
+        value: question.type === 'dropdown' ? { uuid: value } : value
+      };
+    });
+
+    const patientUuid = this.patientData.uuid;
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+    const visitUuid = this.visitType || null;
+    const encounterTypeUuid = this.encounterType || "6e5ec039-8d2a-4172-b3fb-ee9d0ba647b7";
+
+    if (!locationUuid) {
+      console.error('Location UUID is missing from patient data.');
+      return;
+    }
+
+    if (!visitUuid) {
+      console.warn('Visit UUID is missing. Setting visit to null.');
+    }
+
+    if (!this.encounterType) {
+      console.warn('Encounter Type is missing. Using default.');
+    }
+
+    const payload = {
+      patient: patientUuid,
+      visit: visitUuid,
+      encounterType: encounterTypeUuid,
+      form: this.form || "68f03464-e4cf-4336-b264-e3d43f1f123c",
+      obs: obs,
+      orders: [],
+      diagnoses: [],
+      location: locationUuid
+    };
+
+    console.log('Payload to be sent:', payload);
+
+    this.encounterService.submitEncounter(payload).subscribe(
+      (response) => {
+        console.log('API Response:', response);
+        this.modalCtrl.dismiss({ refresh: true, data: response });
+      },
+      (error) => {
+        console.error('API Error:', error);
+        this.modalCtrl.dismiss({ refresh: false, error: error }); 
       }
-    });
-  
-    const payload = { obs };
-  
-    console.log('Payload to Save:', payload);
-  
-    const existingData = localStorage.getItem('screeningData');
-    const dataArray = existingData ? JSON.parse(existingData) : [];
-    dataArray.push(payload);
-    localStorage.setItem('screeningData', JSON.stringify(dataArray));
-  
-    this.modalCtrl.dismiss().then(() => {
-      this.router.navigate(['/bio-medical']);
-    });
+    );
   }
-  
- 
+
   ngOnInit() {
+    this.patientData = this.navParams.get('patientData');
+    this.enrollmentData = this.navParams.get('enrollmentData');
+    this.encounterData = this.navParams.get('encounterData');
+    this.visitType = this.navParams.get('visitType');
+    this.encounterType = this.navParams.get('encounterType');
+    this.form = this.navParams.get('form');
 
-    this.biomedicalForm= this.fb.group({
-      responses: this.fb.array(this.questions.map(() => this.fb.control('')))
+    console.log("Modal Data Received:", {
+      patientData: this.patientData,
+      enrollmentData: this.enrollmentData,
+      encounterData: this.encounterData,
+      visitType: this.visitType,
+      encounterType: this.encounterType,
+      form: this.form
     });
-  }
 
-}
+    this.biomedicalForm = this.fb.group({
+      responses: this.fb.array(this.questions?.map(() => this.fb.control('')) || [])
+    });
+
+    if (this.encounter) {
+      this.populateForm();
+    }
+  }
+}  

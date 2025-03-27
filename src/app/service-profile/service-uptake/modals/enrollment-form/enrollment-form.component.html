@@ -2,11 +2,10 @@
   <ion-toolbar class="toolbar">
     <ion-title>Education Subsidies Application Form</ion-title>
     <ion-buttons slot="end">
-      <ion-buttons slot="end">
-        <ion-button fill="clear" color="light" (click)="closeModal()">
-          <ion-icon name="close"></ion-icon>
-        </ion-button>
-      </ion-buttons> </ion-buttons>
+      <ion-button fill="clear" color="light" (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -14,102 +13,131 @@
   <div *ngIf="currentStep === 1">
     <h2 class="form-heading">Application Details</h2>
     <form [formGroup]="eduForm">
-      <ion-card *ngFor="let question of questions">
-        <ion-card-header>
-          <ion-card-title>{{ question.label }}</ion-card-title>
-        </ion-card-header>
+      <ng-container *ngFor="let question of questions">
+        <ion-card *ngIf="!question.dependsOn || visibleFields[question.concept]">
 
-        <ion-card-content>
+          <ion-card-header>
+            <ion-card-title>{{ question.label }}</ion-card-title>
+          </ion-card-header>
 
-          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
-            formControlName="{{ question.concept }}"></ion-input>
+          <ion-card-content>
+
+            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+              formControlName="{{ question.concept }}"></ion-input>
 
 
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
-            formControlName="{{ question.concept }}" />
+            <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+              formControlName="{{ question.concept }}" />
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines='none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value"
-                (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+            <ion-list *ngIf="question.type === 'radio'">
+              <ion-radio-group formControlName="{{ question.concept }}">
+                <ion-item lines="none" *ngFor="let option of question.options">
+                  <ion-radio slot="start" [value]="option.value"></ion-radio>
+                  <ion-label>{{ option.label }}</ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
 
-      <ion-button class="left-button" (click)="nextStep()">Next</ion-button>
+            <ion-list *ngIf="question.type === 'checkbox'">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-checkbox slot="start" [checked]="eduForm.get(question.concept)?.value?.includes(option.value)"
+                  (ionChange)="onCheckboxChange($event, question.concept, option.value)">
+                </ion-checkbox>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ng-container>
+
+      <div class="button-container">
+
+      <ion-button class="left-button" (click)="nextStep()">Next</ion-button></div>
     </form>
   </div>
 
   <div *ngIf="currentStep === 2">
     <h2 class="form-heading">Education Details</h2>
     <form [formGroup]="secondFormGroup">
-      <ion-card *ngFor="let question of secondSection">
-        <ion-card-header>
-          <ion-card-title>{{ question.label }}</ion-card-title>
-        </ion-card-header>
+      <ng-container *ngFor="let question of secondSection">
+        <ion-card *ngIf="!question.dependsOn || visibleFields[question.concept]">
+          <ion-card-header>
+            <ion-card-title>{{ question.label }}</ion-card-title>
+          </ion-card-header>
 
-        <ion-card-content>
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
-            formControlName="{{ question.concept }}" />
+          <ion-card-content>
+            <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+              formControlName="{{ question.concept }}" />
 
-          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
-            formControlName="{{ question.concept }}"></ion-input>
+            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+              formControlName="{{ question.concept }}" />
+            <ion-input class="custom-input" *ngIf="question.type === 'number'" type="number"
+              formControlName="{{ question.concept }}" />
 
-          <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
-            <ion-select-option *ngFor="let option of question.options" [value]="option.value">
-              {{ option.label }}
-            </ion-select-option>
-          </ion-select>
+            <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
+              <ion-select-option *ngFor="let option of question.options" [value]="option.value">
+                {{ option.label }}
+              </ion-select-option>
+            </ion-select>
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines='none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value"
-                (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+            <ion-list *ngIf="question.type === 'radio'">
+              <ion-radio-group formControlName="{{ question.concept }}">
+                <ion-item lines="none" *ngFor="let option of question.options">
+                  <ion-radio slot="start" [value]="option.value"></ion-radio>
+                  <ion-label>{{ option.label }}</ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ng-container>
+
       <div class="button-container">
         <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
         <ion-button class="right-button" (click)="nextStep()">Next</ion-button>
       </div>
-
-
     </form>
   </div>
+
   <div *ngIf="currentStep === 3">
     <h2 class="form-heading">Applicants Household Details</h2>
     <form [formGroup]="thirdFormGroup">
-      <ion-card *ngFor="let question of thirdSection">
-        <ion-card-header>
-          <ion-card-title>{{ question.label }}</ion-card-title>
-        </ion-card-header>
+      <ng-container *ngFor="let question of thirdSection">
+        <ion-card *ngIf="!question.dependsOn || visibleFields[question.concept]">
 
-        <ion-card-content>
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
-            formControlName="{{ question.concept }}" />
+          <ion-card-header>
+            <ion-card-title>{{ question.label }}</ion-card-title>
+          </ion-card-header>
 
-          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
-            formControlName="{{ question.concept }}"></ion-input>
+          <ion-card-content>
+            <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+              formControlName="{{ question.concept }}" />
 
-          <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
-            <ion-select-option *ngFor="let option of question.options" [value]="option.value">
-              {{ option.label }}
-            </ion-select-option>
-          </ion-select>
+            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+              formControlName="{{ question.concept }}"></ion-input>
+            <ion-input class="custom-input" *ngIf="question.type === 'number'" type="number"
+              formControlName="{{ question.concept }}"></ion-input>
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines='none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value"
-                (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+            <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
+              <ion-select-option *ngFor="let option of question.options" [value]="option.value">
+                {{ option.label }}
+              </ion-select-option>
+            </ion-select>
+
+            <ion-list *ngIf="question.type === 'radio'">
+              <ion-radio-group formControlName="{{ question.concept }}">
+                <ion-item lines="none" *ngFor="let option of question.options">
+                  <ion-radio slot="start" [value]="option.value"></ion-radio>
+                  <ion-label>{{ option.label }}</ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
+
+
+          </ion-card-content>
+        </ion-card>
+      </ng-container>
+
       <div class="button-container">
         <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
         <ion-button class="right-button" (click)="nextStep()">Next</ion-button>
@@ -120,36 +148,58 @@
   <div *ngIf="currentStep === 4">
     <h2 class="form-heading">Approval Section </h2>
     <form [formGroup]="forthFormGroup">
-      <ion-card *ngFor="let question of forthSection">
-        <ion-card-header>
-          <ion-card-title>{{ question.label }}</ion-card-title>
-        </ion-card-header>
+      <ng-container *ngFor="let question of forthSection">
 
-        <ion-card-content>
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date"
-            formControlName="{{ question.concept }}" />
+        <ion-card *ngIf="!question.dependsOn || visibleFields[question.concept]">
 
-          <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
-            formControlName="{{ question.concept }}"></ion-input>
+          <ion-card-header>
+            <ion-card-title>{{ question.label }}</ion-card-title>
+          </ion-card-header>
 
-          <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
-            <ion-select-option *ngFor="let option of question.options" [value]="option.value">
-              {{ option.label }}
-            </ion-select-option>
-          </ion-select>
+          <ion-card-content>
+            <input class="custom-input" *ngIf="question.type === 'date'" type="date"
+              formControlName="{{ question.concept }}" />
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines='none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value"
-                (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
+            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text"
+              formControlName="{{ question.concept }}"></ion-input>
 
+            <ion-input class="custom-input" *ngIf="question.type === 'number'" type="number"
+              formControlName="{{ question.concept }}"></ion-input>
+
+            <ion-select *ngIf="question.type === 'dropdown'" formControlName="{{ question.concept }}">
+              <ion-select-option *ngFor="let option of question.options" [value]="option.value">
+                {{ option.label }}
+              </ion-select-option>
+            </ion-select>
+
+            <ion-list *ngIf="question.type === 'radio'">
+              <ion-radio-group formControlName="{{ question.concept }}">
+                <ion-item lines="none" *ngFor="let option of question.options">
+                  <ion-radio slot="start" [value]="option.value"></ion-radio>
+                  <ion-label>{{ option.label }}</ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
+            <ion-list *ngIf="question.type === 'checkbox'">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-checkbox slot="start"
+                  [checked]="forthFormGroup.get(question.concept)?.value?.includes(option.value) || false"
+                  (ionChange)="onCheckboxChange($event, question.concept, option.value)">
+                </ion-checkbox>
+
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-list>
+
+          </ion-card-content>
+        </ion-card>
+      </ng-container>
+
+      <div class="button-container">
       <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
       <ion-button class="right-button" type="submit" (click)="submitForm()">Submit</ion-button>
+    </div>
+
     </form>
   </div>
 </ion-content>

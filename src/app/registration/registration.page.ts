@@ -186,13 +186,11 @@ export class RegistrationPage implements OnInit {
 
     this.questions.forEach(question => {
       if (question.required) {
-        // For required fields, apply Validators.required
         this.registrationForm.addControl(
           question.label,
           this.fb.control('', Validators.required)
         );
       } else {
-        // For optional fields, no validators
         this.registrationForm.addControl(
           question.label,
           this.fb.control('')
@@ -252,21 +250,19 @@ export class RegistrationPage implements OnInit {
             async (res) => {
               console.log('Submission successful:', res);
           
-              const patientUuid = res.uuid;  // Patient UUID from response
-              const patientName = res.display;  // Use display value from the response (e.g., "MJLMVU - Vancy Otiso")
+              const patientUuid = res.uuid;  
+              const patientName = res.display;  
           
-              // Show alert on successful submission
               const alert = await this.alertController.create({
                 header: 'Success',
                 message: 'Patient registered successfully!',
                 buttons: [
                   {
-                    text: 'Would you like to proceed to screening?',
+                    text: 'Would you like to proceed to Check In?',
                     handler: () => {
-                      // Split the patient name by ' - ' to get the ID part and the full name
-                      const parts = patientName.split(' - ');  // Split by ' - '
-                      const idPart = parts[0];  // ID part (e.g., MJLMVU)
-                      const cleanName = parts[1];  // Full name (e.g., levin Munyelele)
+                      const parts = patientName.split(' - ');  
+                      const idPart = parts[0];  
+                      const cleanName = parts[1];  
           
                       console.log('Navigating to Screening with:', patientUuid, idPart, cleanName);
                       this.navCtrl.navigateForward(`/visit/${patientUuid}/${idPart}/${cleanName}`);
@@ -275,7 +271,6 @@ export class RegistrationPage implements OnInit {
                   {
                     text: 'Go to Home',
                     handler: () => {
-                      // Navigate to the home page
                       this.navCtrl.navigateBack('/home');
                     }
                   }

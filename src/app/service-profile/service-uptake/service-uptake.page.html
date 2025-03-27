@@ -83,7 +83,14 @@
     </ion-card>
     
     <ion-card>
-      <ion-item button [routerLink]="['post-violence']">
+      <ion-item button [routerLink]="['post-violence']" [queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: form,
+        encounterType: encounterType
+      }">
         <ion-icon name="hand-left-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Post-Violence Care Services</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -91,7 +98,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['social-protection']">
+      <ion-item button [routerLink]="['social-protection']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: form,
+        encounterType: encounterType
+      }">
         <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Social Protection Services</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -99,7 +113,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['other']">
+      <ion-item button [routerLink]="['other']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: form,
+        encounterType: encounterType
+      }">
         <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Other Services</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -109,7 +130,14 @@
 
   <ion-list *ngIf="selectedSegment === 'application-forms'">
     <ion-card>
-      <ion-item button [routerLink]="['enrollment-form']">
+      <ion-item button [routerLink]="['enrollment-form']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: 'ef61cfb8-7dfe-46d7-94f0-8c50ecbbb0be', 
+        encounterType: 'c34c69a1-5383-46b3-a0e7-b43d06c55706'
+      }">
         <ion-icon name="school-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Education Subsidies Application Form</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -117,15 +145,30 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['hts-eligibility']">
-        <ion-icon name="clipboard-outline" slot="start" color="primary"></ion-icon>
-        <ion-label>HTS Eligibility Tool</ion-label>
-        <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
-      </ion-item>
-    </ion-card>
+    <ion-item button [routerLink]="['hts-eligibility']" [queryParams]="{
+      data: patientDataStringified,
+      enrollmentData: enrollmentDataStringified,
+      encounterData: encounterDataStringified,
+      visit: visitType,
+      form: 'f19d7337-5c39-4928-a27e-d6ea50545312', 
+      encounterType: '550f00d0-72f0-4df4-8cee-5024885caf5a'
+    }">
+      <ion-icon name="clipboard-outline" slot="start" color="primary"></ion-icon>
+      <ion-label>HTS Eligibility Tool</ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
+    </ion-item>
+  </ion-card>
+
 
     <ion-card>
-      <ion-item button [routerLink]="['home-visit']">
+      <ion-item button [routerLink]="['home-visit']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: '550f00d0-72f0-4df4-8cee-5024885caf5a', 
+        encounterType: 'f19d7337-5c39-4928-a27e-d6ea50545312'
+      }">
         <ion-icon name="home-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Education Support: Home Visit</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -133,7 +176,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['prep-rast']">
+      <ion-item button [routerLink]="['prep-rast']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: '68f03464-e4cf-4336-b264-e3d43f1f123c', 
+        encounterType: '6e5ec039-8d2a-4172-b3fb-ee9d0ba647b7'
+      }">
         <ion-icon name="pulse-outline" slot="start" color="primary"></ion-icon>
         <ion-label>PreP Rapid Assessment Tool (RAST)</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -141,7 +191,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['violence-screening']">
+      <ion-item button [routerLink]="['violence-screening']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: 'f19d7337-5c39-4928-a27e-d6ea50545312', 
+        encounterType: '550f00d0-72f0-4df4-8cee-5024885caf5a'
+      }">
         <ion-icon name="shield-checkmark-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Violence Screening and Service Summary Form</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -149,7 +206,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['business-follow-up']">
+      <ion-item button [routerLink]="['business-follow-up']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: '75f5df09-3b34-4c54-9350-610bf27fad40', 
+        encounterType: '4e0a7874-8c4f-4432-8365-6c14059037c3'
+      }">
         <ion-icon name="briefcase-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Business Start-up - Follow-up Tool</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -157,7 +221,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['agyw-graduation']">
+      <ion-item button [routerLink]="['agyw-graduation']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: '9307271b-fdac-4399-a4c6-cc3e049fd1c1', 
+        encounterType: '02c4f927-7149-4235-859a-f2fa20fcf715'
+      }">
         <ion-icon name="trophy-outline" slot="start" color="primary"></ion-icon>
         <ion-label>AGYW Graduation Scorecard</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -165,7 +236,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['sti-screening']">
+      <ion-item button [routerLink]="['sti-screening']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: 'a0e0578c-c28c-4cbb-a8cd-d9ffcafb5825', 
+        encounterType: 'a019b9af-90ea-4565-af43-2faa8ff6b0fd'
+      }">
         <ion-icon name="medkit-outline" slot="start" color="primary"></ion-icon>
         <ion-label>STI Screening Tool</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -173,7 +251,14 @@
     </ion-card>
 
     <ion-card>
-      <ion-item button [routerLink]="['business-assessment']">
+      <ion-item button [routerLink]="['business-assessment']"[queryParams]="{
+        data: patientDataStringified,
+        enrollmentData: enrollmentDataStringified,
+        encounterData: encounterDataStringified,
+        visit: visitType,
+        form: 'd81a8a5e-43c2-4a9b-b276-34f8a91db02f', 
+        encounterType: 'd218dace-3e79-47b2-8620-512a4d2771b1'
+      }">
         <ion-icon name="stats-chart-outline" slot="start" color="primary"></ion-icon>
         <ion-label>Business Start-up Assessment & Rating Tool</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end" color="primary"></ion-icon>
@@ -192,6 +277,6 @@
   <!-- Enrolle Content -->
   <ion-list *ngIf="selectedSegment === 'enrolle'">
     <ion-item>
-      <ion-label>Enrolle Content Here</ion-label>
+      <ion-label>Enrollement Content Here</ion-label>
     </ion-item>
   </ion-list>

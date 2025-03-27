@@ -42,7 +42,7 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.setGreeting();
     this.setDate();
-    this.getWeatherByLocation();
+    // this.getWeatherByLocation();
     this.loadVisits();
     this.loadLocations(); 
 
@@ -69,35 +69,35 @@ export class HomePage implements OnInit {
     this.currentDate = new Date().toLocaleDateString(undefined, options);
   }
 
-  getWeatherByLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          this.roleService.getWeatherByCoordinates(latitude, longitude).subscribe({
-            next: (response) => {
-              this.temperature = response.current.temp_c;
-              this.condition = response.current.condition.text;
-              this.iconUrl = `https:${response.current.condition.icon}`;
-              this.locationName = response.location.name; 
-            },
-            error: () => {
-              this.temperature = 'Unavailable';
-              this.condition = 'Unavailable';
-              this.iconUrl = '';
-              this.locationName = 'Location not found';
-            },
-          });
-        },
-        (error) => {
-          this.locationError = 'Location access denied. Please allow location access.';
-          console.error('Geolocation error:', error);
-        }
-      );
-    } else {
-      this.locationError = 'Geolocation is not supported by this browser.';
-    }
-  }
+  // getWeatherByLocation() {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const { latitude, longitude } = position.coords;
+  //         this.roleService.getWeatherByCoordinates(latitude, longitude).subscribe({
+  //           next: (response) => {
+  //             this.temperature = response.current.temp_c;
+  //             this.condition = response.current.condition.text;
+  //             this.iconUrl = `https:${response.current.condition.icon}`;
+  //             this.locationName = response.location.name; 
+  //           },
+  //           error: () => {
+  //             this.temperature = 'Unavailable';
+  //             this.condition = 'Unavailable';
+  //             this.iconUrl = '';
+  //             this.locationName = 'Location not found';
+  //           },
+  //         });
+  //       },
+  //       (error) => {
+  //         this.locationError = 'Location access denied. Please allow location access.';
+  //         console.error('Geolocation error:', error);
+  //       }
+  //     );
+  //   } else {
+  //     this.locationError = 'Geolocation is not supported by this browser.';
+  //   }
+  // }
 
   loadLocations() {
     this.locationService.getLocations().subscribe({
@@ -133,13 +133,12 @@ export class HomePage implements OnInit {
   
         const patientUuids = this.patientSearchResults.map((patient) => patient.uuid);
   
-        // Fetch all visit data in one API call
         this.encounterService.getPatientsVisits(patientUuids).subscribe((visits: any[]) => {
           this.patientSearchResults = this.patientSearchResults.map((patient) => {
             const visit = visits.find((v) => v.patient.uuid === patient.uuid);
             return {
               ...patient,
-              hasActiveVisit: visit ? !visit.stopDatetime : false, // True if stopDatetime is null
+              hasActiveVisit: visit ? !visit.stopDatetime : false, 
             };
           });
   
@@ -193,35 +192,34 @@ export class HomePage implements OnInit {
   
   onLocationChange(event: any) {
     this.selectedLocationId = event.detail.value;
-    this.loadVisits(); // Reload visits for the new location
+    this.loadVisits(); 
   }
 
   loadVisits() {
-    if (!this.selectedLocationId) return; // Ensure a location is selected
+    if (!this.selectedLocationId) return; 
     this.visit.getVisits(this.selectedLocationId).subscribe({
       next: (data) => {
-        this.visits = data.results; // Assuming API returns { results: [...] }
+        this.visits = data.results; 
         console.log('Visits:', this.visits);
       },
       error: (error) => {
         console.error('Error loading visits:', error);
-        this.visits = []; // Ensure visits is empty if there's an error
+        this.visits = []; 
       }
     });
   }
   
 
   async checkIn(patientUuid: string, name: string) {
-    const cleanName = name.split(' - ')[1] || name; // Process name
+    const cleanName = name.split(' - ')[1] || name; 
   
     const modal = await this.modalCtrl.create({
-      component: VisitPage, // Load VisitPage in the modal
+      component: VisitPage, 
       componentProps: { 
         patientUuid, 
-        patientName: cleanName // Pass both values
+        patientName: cleanName 
       }, 
-      breakpoints: [0, 0.5, 1], // Allows modal to be minimized, half-screen, or full
-      initialBreakpoint: 0.5, // Opens in half-screen mode
+      breakpoints: [0, 0.5, 1]
     });
   
     await modal.present();

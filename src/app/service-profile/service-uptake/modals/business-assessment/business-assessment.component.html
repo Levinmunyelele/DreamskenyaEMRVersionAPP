@@ -53,11 +53,13 @@
             </ion-select-option>
           </ion-select>
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines = 'none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group formControlName="{{ question.concept }}">
+              <ion-item lines="none" *ngFor="let option of question.options">
+                <ion-radio slot="start" [value]="option.value"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
           </ion-list>
         </ion-card-content>
       </ion-card>

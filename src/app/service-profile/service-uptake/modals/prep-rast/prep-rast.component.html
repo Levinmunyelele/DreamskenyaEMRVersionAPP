@@ -1,39 +1,68 @@
-<ion-header class="header">
-  <ion-toolbar class="toolbar">
-    <ion-title>RAST</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>PreP Rapid Assessment Tool (RAST)</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" color="light" (click)="closeModal()">Close</ion-button>
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="content">
-  <div >
-    <form [formGroup]="prepForm">
-      <ion-card *ngFor="let question of questions">
-        <ion-card-header>
-          <ion-card-title>{{ question.label }}</ion-card-title>
-        </ion-card-header>
-        
-        <ion-card-content>
+<ion-content>
+  <form [formGroup]="prepForm" (ngSubmit)="submitForm()">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>RAST</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div formArrayName="responses">
+          <div *ngFor="let question of questions; let i = index" class="question-container">
 
-            <ion-input class="custom-input" *ngIf="question.type === 'text'" type="text" formControlName="{{ question.concept }}"></ion-input>
-          
+            <ion-card>
+              <ion-card-content>
+                <div *ngIf="question.type === 'dropdown'">
+                  <label>{{ question.label }}</label>
+                  <select [formControlName]="i" class="form-control">
+                    <option *ngFor="let option of question.options" [value]="option.value">
+                      {{ option.label }}
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="question.type === 'date'">
+                  <label>{{ question.label }}</label>
+                  <input type="date" [formControlName]="i" class="form-control" />
+                </div>
+                <div *ngIf="question.type === 'text'">
+                  <label>{{ question.label }}</label>
+                  <input type="text" [formControlName]="i" class="form-control" />
+                </div>
+                <div *ngIf="question.type === 'textarea'">
+                  <label>{{ question.label }}</label>
+                  <textarea [formControlName]="i" class="form-control"></textarea>
+                </div>
+                <div *ngIf="question.type === 'radio'">
+                  <label>{{ question.label }}</label>
+                  <ion-radio-group [formControlName]="i" class="square-radio-group">
+                    <ion-item lines="none" *ngFor="let option of question.options" class="square-radio-item">
+                      <ion-radio slot="start" [value]="option.value" class="square-radio"></ion-radio>
+                      <ion-label>{{ option.label }}</ion-label>
+                    </ion-item>
+                  </ion-radio-group>
+                </div>
+                <div *ngIf="!question.type">
+                  <p>Unsupported question type</p>
+                </div>
+              </ion-card-content>
+            </ion-card>
 
-          <input class="custom-input" *ngIf="question.type === 'date'" type="date" formControlName="{{ question.concept }}" />
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines = 'none' *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-button class="right-button" type="submit" (click)="submitForm()">Submit</ion-button>
-    </form>
-  </div>
-  
- 
+    <button type="submit" [disabled]="prepForm.invalid" class="btn btn-primary mt-3">
+      Submit
+    </button>
+  </form>
 </ion-content>

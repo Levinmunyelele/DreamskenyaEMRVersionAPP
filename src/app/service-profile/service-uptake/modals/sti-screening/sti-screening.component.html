@@ -2,7 +2,9 @@
   <ion-toolbar class="toolbar">
     <ion-title>STI Screening Tool</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" color="light" (click)="closeModal()">Close</ion-button>
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -23,16 +25,22 @@
 
           <input class="custom-input" *ngIf="question.type === 'date'" type="date" formControlName="{{ question.concept }}" />
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines="none" *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
+          
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group [formControlName]="question.concept" class="square-radio-group">
+              <ion-item lines="none" *ngFor="let option of question.options" class="square-radio-item">
+                <ion-radio slot="start" [value]="option.value" class="square-radio"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
           </ion-list>
+          
         </ion-card-content>
       </ion-card>
+    <div class="button-container">
+      <ion-button class="right-button" (click)="nextStep()">Next</ion-button>
+    </div>
 
-      <ion-button class="left-button" (click)="nextStep()">Next</ion-button>
     </form>
   </div>
   
@@ -57,19 +65,22 @@
             </ion-select-option>
           </ion-select>
 
-          <ion-list *ngIf="question.type === 'checkbox'">
-            <ion-item lines="none" *ngFor="let option of question.options">
-              <ion-checkbox slot="start" [value]="option.value" (ionChange)="onCheckboxChange($event, question.concept)"></ion-checkbox>
-              <ion-label>{{ option.label }}</ion-label>
-            </ion-item>
+          
+          <ion-list *ngIf="question.type === 'radio'">
+            <ion-radio-group [formControlName]="question.concept" class="square-radio-group">
+              <ion-item lines="none" *ngFor="let option of question.options" class="square-radio-item">
+                <ion-radio slot="start" [value]="option.value" class="square-radio"></ion-radio>
+                <ion-label>{{ option.label }}</ion-label>
+              </ion-item>
+            </ion-radio-group>
           </ion-list>
+          
         </ion-card-content>
       </ion-card>
       <div class="button-container">
         <ion-button class="left-button" (click)="previousStep()">Back</ion-button>
         <ion-button class="right-button" type="submit" (click)="submitForm()">Submit</ion-button>
       </div>
-      
 
     </form>
   </div>
