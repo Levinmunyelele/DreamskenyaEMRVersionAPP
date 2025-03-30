@@ -49,6 +49,9 @@ export class EncounterService {
     return this.apiService.post('patient', payload);
   }
 
+  getPatientProgramEnrollments(patientUuid: string): Observable<any> {
+    return this.apiService.get(`programenrollment?patient=${patientUuid}&v=full`);
+  }
   getPatientsVisits(patientUuids: string[]): Observable<any[]> {
     if (patientUuids.length === 0) {
       return new Observable((observer) => {

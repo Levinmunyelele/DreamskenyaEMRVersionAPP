@@ -54,6 +54,8 @@ export class ServiceUptakePage implements OnInit {
       }
     });
 
+    this.extractDOB();
+
   }
   onSegmentChanged(event: any) {
     this.selectedSegment = event.detail.value;

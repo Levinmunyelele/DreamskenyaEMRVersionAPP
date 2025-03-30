@@ -1085,7 +1085,7 @@ this.encounterService.submitEncounter(encounterPayload).pipe(
         {
           text: "OK",
           handler: () => {
-            this.router.navigate(['/service-uptake'], {
+            this.router.navigate(['/service-uptake', patientUuid], {
               queryParams: { 
                 visit: this.visitType,
                 enrollmentData: JSON.stringify(programEnrollmentResponse), 

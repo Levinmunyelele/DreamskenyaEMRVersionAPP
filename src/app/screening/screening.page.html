@@ -41,9 +41,15 @@
     </ion-item>
   </ion-card>
   
-  <!-- No Results Message -->
-  <ion-text *ngIf="noResults" class="ion-text-center">
-    No patients found.
-  </ion-text>
+ <!-- No Results Message -->
+<ion-card *ngIf="noResults">
+  <ion-item>
+    <ion-label class="ion-text-center">
+      <h2>{{ searchQuery }}</h2>
+      <p><strong>Status:</strong> Not Enrolled</p>
+    </ion-label>
+  </ion-item>
+</ion-card>
+
 
 </ion-content>
