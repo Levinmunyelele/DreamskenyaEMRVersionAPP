@@ -97,10 +97,19 @@ export class ScreeningPage implements OnInit {
   }
 
   viewPatient(patient: any) {
-    this.router.navigate(['/service-uptake', patient.uuid], {
-      queryParams: { data: JSON.stringify(patient.rawData) },
+    console.log('Patient Data:', patient); 
+
+    const idPart = patient.dreamsId?.trim() || 'N/A';  
+    const cleanName = encodeURIComponent(patient.name?.trim() || 'Unknown'); 
+
+    console.log('Navigating to:', `/visit/${patient.uuid}/${idPart}/${cleanName}`); 
+
+    this.router.navigate(['/visit', patient.uuid, idPart, cleanName], {
+      queryParams: { patientData: JSON.stringify(patient.rawData) }, // Changed to patientData
     });
-  }
+}
+
+  
 
   getAge(dob: string): number {
     if (!dob) return 0;

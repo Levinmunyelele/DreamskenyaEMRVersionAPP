@@ -13,8 +13,6 @@ export class ServiceUptakePage implements OnInit {
   uptakeForm!: FormGroup;
 
 
-
-
   questions = [
 
     {

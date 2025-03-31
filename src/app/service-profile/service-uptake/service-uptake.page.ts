@@ -4,7 +4,6 @@ import { DatePipe } from '@angular/common';
 import { VisitService } from 'src/app/services/visit.service';
 import { ActionSheetController, ToastController } from '@ionic/angular';
 
-
 @Component({
   selector: 'app-service-uptake',
   templateUrl: './service-uptake.page.html',
@@ -12,50 +11,64 @@ import { ActionSheetController, ToastController } from '@ionic/angular';
   providers: [DatePipe]
 })
 export class ServiceUptakePage implements OnInit {
+  visitId: string | null = null;
+  date: string | null = null;
+  location: string | null = null;
+  visitType: string | null = null;
+  cleanName: string | null = null;
+  patientData: any;
+  patientDataStringified: string | null = null;
   enrollmentData: any;
+  enrollmentDataStringified: string | null = null;
   encounterData: any;
+  encounterDataStringified: string | null = null;
   birthDate: string | null = null;
   age: number | null = null;
   selectedSegment: string = 'service-uptake';
-  visitType: any;
-  patientData: any;
   encounterType: string = "de556fe5-9dea-4187-bd6f-1e15b43e2ca3";
   form: string = "d37919b7-a2e4-4683-9271-a29024b4f329";
 
-  patientDataStringified: string | null = null;
-  enrollmentDataStringified: string | null = null;
-  encounterDataStringified: string | null = null;
-
-
-
-  constructor
-  (private route: ActivatedRoute,
+  constructor(
+    private route: ActivatedRoute,
     private datePipe: DatePipe,
     private visitService: VisitService,
     private actionSheetCtrl: ActionSheetController,
-    private toastController: ToastController) { }
+    private toastController: ToastController
+  ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['data']) {
-        this.patientData = JSON.parse(params['data']);
-        this.patientDataStringified = JSON.stringify(this.patientData);
+        try {
+          this.patientData = JSON.parse(params['data']);
+          console.log('Extracted Patient Data:', this.patientData);
+        } catch (error) {
+          console.error('Error parsing patient data:', error);
+        }
       }
-      if (params['enrollmentData']) {
-        this.enrollmentData = JSON.parse(params['enrollmentData']);
-        this.enrollmentDataStringified = JSON.stringify(this.enrollmentData);
+      if (params['visitId']) {
+        this.visitId = params['visitId'];
+        console.log('Extracted Visit ID:', this.visitId);
       }
-      if (params['encounterData']) {
-        this.encounterData = JSON.parse(params['encounterData']);
-        this.encounterDataStringified = JSON.stringify(this.encounterData);
+      if (params['date']) {
+        this.date = params['date'];
+        console.log('Extracted Date:', this.date);
       }
-      if (params['visit']) {
-        this.visitType = params['visit'];
+      if (params['location']) {
+        this.location = params['location'];
+        console.log('Extracted Location:', this.location);
+      }
+      if (params['visitType']) {
+        this.visitType = params['visitType'];
+        console.log('Extracted Visit Type:', this.visitType);
+      }
+      if (params['cleanName']) {
+        this.cleanName = params['cleanName'];
+        console.log('Extracted Clean Name:', this.cleanName);
       }
     });
 
     this.extractDOB();
-
   }
   onSegmentChanged(event: any) {
     this.selectedSegment = event.detail.value;

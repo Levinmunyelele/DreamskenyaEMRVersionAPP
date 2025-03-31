@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
-import { Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +30,23 @@ export class VisitService {
       })
     );
   }
+  getVisitHistory(patientUuid: string): Observable<{ results: any[] }> {
+    const params = { patient: patientUuid };
+    return this.apiService.get('visit', params, false).pipe(
+      map((response: any) => {
+        // ✅ Ensure response is an object, default to `{ results: [] }`
+        if (response && typeof response === 'object' && !Array.isArray(response)) {
+          return response;
+        }
+        return { results: response || [] }; // Convert array responses to `{ results: [...] }`
+      }),
+      catchError(error => {
+        console.error(' Error fetching visit history:', error);
+        return of({ results: [] }); // Default empty response
+      })
+    );
+  }
+  
 
   checkoutVisit(locationUuid: string, visitTypeUuid: string): Observable<any> {
     const visitUuid = this.getVisitUuid();

@@ -25,12 +25,24 @@ ion-content::before {
 }
 
 .logo-container {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
   margin-top: 60px;
   margin-bottom: 40px;
-  display: flex;
-  justify-content: center;
 }
 
+.kenya-emr-text {
+  color: #e7b556;
+  font-size: 25px;
+  font-weight: bold;
+  font-family: sans-serif;
+  text-align: center;
+  width: 100%;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
 .logo {
   width: 165px;
   height: 155px;
