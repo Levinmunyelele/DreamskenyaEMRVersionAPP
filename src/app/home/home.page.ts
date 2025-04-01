@@ -210,21 +210,23 @@ export class HomePage implements OnInit {
   }
   
 
-  async checkIn(patientUuid: string, name: string) {
-    const cleanName = name.split(' - ')[1] || name; 
+  async checkIn(patientUuid: string, name: string, patient: any) {
+    console.log('Patient Data:', patient);  // Log the patient data to ensure it's correct
+  
+    const cleanName = name.split(' - ')[1] || name;
   
     const modal = await this.modalCtrl.create({
-      component: VisitPage, 
-      componentProps: { 
-        patientUuid, 
-        patientName: cleanName 
-      }, 
+      component: VisitPage,
+      componentProps: {
+        patientUuid,      // Pass the patient UUID
+        patientName: cleanName,  // Pass the clean patient name
+        patientData: patient // Pass the entire patient data object
+      },
       breakpoints: [0, 0.5, 1]
     });
   
     await modal.present();
   }
-  
   
   
 }

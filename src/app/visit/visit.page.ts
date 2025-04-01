@@ -26,7 +26,7 @@ export class VisitPage implements OnInit {
   idPart!: string;
   cleanName!: string;
   patientData: any;
-
+ 
   constructor(
     private modalCtrl: ModalController,
     private fb: FormBuilder,
@@ -240,6 +240,8 @@ export class VisitPage implements OnInit {
             const cleanName = encodeURIComponent(patientName);
             const visitDate = visitPayload.startDatetime;
             const locationUuid = visitPayload.location;
+            const stringifiedData = JSON.stringify(this.patientData);
+          console.log("Stringified patient data:", stringifiedData);
   
             if (hasVisitedBefore) {
               console.log("Patient Data from ngOnInit for navigation:", this.patientData);
@@ -275,7 +277,7 @@ export class VisitPage implements OnInit {
   
                       this.router.navigate([`/vulnerability-screening`, patientUuid, idPart, cleanName], {
                         queryParams: {
-                          visitId: response.uuid,  // Pass visit ID
+                          visitId: response.uuid,  
                           date: visitDate,
                           location: locationUuid,
                           visitType: this.visitType,

@@ -39,13 +39,12 @@ export class ServiceUptakePage implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['data']) {
-        try {
-          this.patientData = JSON.parse(params['data']);
-          console.log('Extracted Patient Data:', this.patientData);
-        } catch (error) {
-          console.error('Error parsing patient data:', error);
-        }
+        this.patientData = JSON.parse(params['data']);
+        console.log('Received Patient Data:', this.patientData);
+      } else {
+        console.error('No patient data found in query params.');
       }
+
       if (params['visitId']) {
         this.visitId = params['visitId'];
         console.log('Extracted Visit ID:', this.visitId);
@@ -67,7 +66,9 @@ export class ServiceUptakePage implements OnInit {
         console.log('Extracted Clean Name:', this.cleanName);
       }
     });
-
+    this.patientDataStringified = JSON.stringify(this.patientData);  
+    this.enrollmentDataStringified = JSON.stringify(this.enrollmentData); 
+    this.encounterDataStringified = JSON.stringify(this.encounterData);
     this.extractDOB();
   }
   onSegmentChanged(event: any) {
@@ -142,19 +143,22 @@ export class ServiceUptakePage implements OnInit {
   }
 
   async checkout() {
-    const visitUuid = this.encounterData?.visit?.uuid;
-    const locationUuid = this.encounterData?.location?.uuid;
-    const visitTypeUuid = this.visitType;
-
+    const visitUuid = this.encounterData?.visit?.uuid || this.visitId; 
+    const locationUuid = this.encounterData?.location?.uuid || this.location;  
+    const visitTypeUuid = this.visitType;  
+    console.log('Visit UUID:', visitUuid);
+    console.log('Location UUID:', locationUuid);
+    console.log('Visit Type UUID:', visitTypeUuid);
+  
     if (!visitUuid || !locationUuid || !visitTypeUuid) {
       console.error("Missing required data for checkout!", { visitUuid, locationUuid, visitTypeUuid });
       return;
     }
-
+  
     this.visitService.checkoutVisit(locationUuid, visitTypeUuid).subscribe(
       async response => {
         console.log("Checkout Successful:", response);
-
+  
         const toast = await this.toastController.create({
           message: 'Checkout successful!',
           duration: 2000,
@@ -162,14 +166,14 @@ export class ServiceUptakePage implements OnInit {
           color: 'success'
         });
         await toast.present();
-
+  
         setTimeout(() => {
           window.location.href = '/home';
         }, 2000);
       },
       async error => {
         console.error("Checkout Failed:", error);
-
+  
         const toast = await this.toastController.create({
           message: 'Checkout failed! Please try again.',
           duration: 2000,
@@ -180,4 +184,5 @@ export class ServiceUptakePage implements OnInit {
       }
     );
   }
+  
 }  

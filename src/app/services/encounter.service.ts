@@ -29,7 +29,7 @@ export class EncounterService {
       });
     }
 
-    return this.apiService.get(`encounter?patient=${patientUuid}&encounterType=${encounterType}&limit=10&v=full`).pipe(
+    return this.apiService.get(`encounter?patient=${patientUuid}&encounterType=${encounterType}&limit=100&v=full`).pipe(
       map((response: { results: any[] }) => response.results || [])
     );
   } 

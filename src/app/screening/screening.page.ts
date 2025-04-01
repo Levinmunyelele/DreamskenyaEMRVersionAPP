@@ -97,19 +97,19 @@ export class ScreeningPage implements OnInit {
   }
 
   viewPatient(patient: any) {
-    console.log('Patient Data:', patient); 
+    console.log('Patient Data:', patient);
 
-    const idPart = patient.dreamsId?.trim() || 'N/A';  
-    const cleanName = encodeURIComponent(patient.name?.trim() || 'Unknown'); 
+    const idPart = patient.dreamsId?.trim() || 'N/A';
+    const cleanName = encodeURIComponent(patient.name?.trim() || 'Unknown');
 
-    console.log('Navigating to:', `/visit/${patient.uuid}/${idPart}/${cleanName}`); 
+    console.log('Navigating to:', `/visit/${patient.uuid}/${idPart}/${cleanName}`);
 
     this.router.navigate(['/visit', patient.uuid, idPart, cleanName], {
-      queryParams: { patientData: JSON.stringify(patient.rawData) }, // Changed to patientData
+      queryParams: { patientData: JSON.stringify(patient.rawData) },
     });
-}
+  }
 
-  
+
 
   getAge(dob: string): number {
     if (!dob) return 0;

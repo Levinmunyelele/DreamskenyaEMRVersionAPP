@@ -35,12 +35,15 @@
             <h2>{{ patient.display }}</h2>
             <p>{{ patient.uuid }}</p>
           </ion-label>
-          <ion-button (click)="checkIn(patient.uuid, patient.display)" slot="end" [disabled]="patient.hasActiveVisit">
+          <ion-button 
+            (click)="checkIn(patient.uuid, patient.display, patient)" 
+            slot="end" 
+            [disabled]="patient.hasActiveVisit">
             Check In
           </ion-button>
-
         </ion-item>
       </ion-list>
+      
       <p *ngIf="noResults" class="no-results-message">No results match.</p>
       <ion-button *ngIf="noResults" expand="full" (click)="goToRegistration()">Add Patient</ion-button>
     </ion-card-content>
