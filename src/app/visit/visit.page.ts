@@ -79,10 +79,16 @@ export class VisitPage implements OnInit {
         this.patientData = JSON.parse(params['patientData']);
         console.log('Retrieved Patient Data:', this.patientData);
       } else {
-        console.error('No patient data found in query params.');
+        // fallback if patientData is not passed
+        this.patientData = {
+          uuid: this.patientUuid,
+          idPart: this.idPart,
+          name: decodeURIComponent(this.cleanName)
+        };
+        console.log('Built Patient Data from route params:', this.patientData);
       }
     });
-
+    
     this.attributes = [
       { attributeType: '3b9dfac8-9e4d-11ee-8c90-0242ac120002', value: 'false' },
       { attributeType: 'e6cb0c3b-04b0-4117-9bc6-ce24adbda802', value: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74' }
@@ -115,6 +121,10 @@ export class VisitPage implements OnInit {
     });
 
   }
+
+  goBack() {
+    this.modalCtrl.dismiss();
+  }  
 
   fetchDropdownData() {
     forkJoin({
@@ -225,7 +235,7 @@ export class VisitPage implements OnInit {
         };
   
         this.visitService.postVisitQueueEntry(visitPayload).subscribe({
-          next: async (response) => {
+          next: (response) => {
             console.log('Visit successfully submitted:', response);
   
             const patientUuid = response.patient?.uuid;
@@ -241,55 +251,44 @@ export class VisitPage implements OnInit {
             const visitDate = visitPayload.startDatetime;
             const locationUuid = visitPayload.location;
             const stringifiedData = JSON.stringify(this.patientData);
-          console.log("Stringified patient data:", stringifiedData);
   
             if (hasVisitedBefore) {
-              console.log("Patient Data from ngOnInit for navigation:", this.patientData);
-              const stringifiedData = JSON.stringify(this.patientData);
-              console.log("Stringified patient data:", stringifiedData);
               console.log(`Navigating to Service Uptake with: ${patientUuid}, ${idPart}, ${cleanName}`);
               this.router.navigate([`/service-uptake`, patientUuid], {
-                  queryParams: {
-                      visitId: response.uuid,
-                      date: visitDate,
-                      location: locationUuid,
-                      visitType: this.visitType,
-                      cleanName,
-                      data: stringifiedData
-                  }
+                queryParams: {
+                    visitId: response.uuid,
+                    date: visitDate,
+                    location: locationUuid,
+                    visitType: this.visitType,
+                    cleanName,
+                    data: stringifiedData
+                }
               });
-          
+  
             } else {
               console.log(`Navigating to Screening with: ${patientUuid}, ${idPart}, ${cleanName}`);
-              const alert = await this.alertController.create({
-                header: 'Check-in Successful',
-                message: 'The patient has been successfully checked in. Would you like to proceed to screening?',
-                buttons: [
-                  {
-                    text: 'Go to Screening',
-                    handler: async () => {
-                      console.log(`Navigating to: /vulnerability-screening/${patientUuid}/${idPart}/${cleanName}`);
   
-                      const isModalOpen = await this.modalCtrl.getTop();
-                      if (isModalOpen) {
-                        await this.modalCtrl.dismiss();
-                      }
-  
-                      this.router.navigate([`/vulnerability-screening`, patientUuid, idPart, cleanName], {
-                        queryParams: {
-                          visitId: response.uuid,  
-                          date: visitDate,
-                          location: locationUuid,
-                          visitType: this.visitType,
-                          cleanName
-                        }
-                      });
-                    }
-                  }
-                ]
+              this.router.navigate([`/service-uptake`, patientUuid], {
+                queryParams: {
+                  visitId: response.uuid,
+                  date: visitDate,
+                  location: locationUuid,
+                  visitType: this.visitType,
+                  cleanName,
+                  data: JSON.stringify(this.patientData)
+                },
+                replaceUrl: true
               });
+              
   
-              await alert.present();
+              setTimeout(async () => {
+                const alert = await this.alertController.create({
+                  header: 'Check-in Successful',
+                  message: 'The patient has been successfully checked in. Would you like to proceed to screening?',
+                  buttons: [{ text: 'OK' }]
+                });
+                await alert.present();
+              }, 1000); 
             }
           },
           error: (error) => {
@@ -302,5 +301,4 @@ export class VisitPage implements OnInit {
       }
     });
   }
-  
-}
+}  

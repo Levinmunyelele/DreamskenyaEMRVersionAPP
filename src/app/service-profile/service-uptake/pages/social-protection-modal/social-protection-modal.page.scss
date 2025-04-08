@@ -2,18 +2,25 @@
   --width: 80%;
   --max-width: 500px;
   --height: auto;
-  --border-radius: 15px;
+  --border-radius: 8px;
   --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   --background: white;
   --top: 15%;
-  padding-bottom: 20px;
-
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+@media screen and (max-width: 500px) {
+  ::ng-deep .popup-modal {
+    --width: 105%;
+    --max-width: 200%;
+    --height: 100vh;
+    --top: 10%;
+  }
+}
 /* Modal Header */
 ion-header {
   border-top-left-radius: 15px;
@@ -122,15 +129,6 @@ textarea.form-control {
   cursor: not-allowed;
 }
 
-/* Ensure modal appears as a pop-up on smaller screens */
-@media screen and (max-width: 500px) {
-  ::ng-deep .popup-modal {
-    --width: 90%;
-    --max-width: 90%;
-    --height: 70vh;
-    --top: 10%;
-  }
-}
 
 /* Dimmed backdrop */
 .popup-modal::part(backdrop) {

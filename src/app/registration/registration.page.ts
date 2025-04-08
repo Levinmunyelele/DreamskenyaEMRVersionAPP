@@ -168,6 +168,7 @@ export class RegistrationPage implements OnInit {
 
   minYear: string;
   maxYear: string;
+  conceptMap: any;
 
   constructor(
     private fb: FormBuilder,
@@ -214,15 +215,15 @@ export class RegistrationPage implements OnInit {
             identifiers: [
               {
                 identifier: generatedIdentifier,
-                identifierType: "dfacd928-0370-4315-99d7-6ec1c9f7ae76",  
-                location: "4e6d8b82-924f-400e-8659-f97389917a85",  
+                identifierType: "dfacd928-0370-4315-99d7-6ec1c9f7ae76",
+                location: "4e6d8b82-924f-400e-8659-f97389917a85",
                 preferred: true
               }
             ],
             person: {
-              gender: formData['Sex'],  
-              birthdate: formData['Date of Birth'],  
-              birthdateEstimated: false,  
+              gender: formData['Sex'],
+              birthdate: formData['Date of Birth'],
+              birthdateEstimated: false,
               names: [
                 {
                   givenName: formData['First Name'],
@@ -232,12 +233,12 @@ export class RegistrationPage implements OnInit {
               ],
               addresses: [
                 {
-                  address2: formData['Landmark'],       
-                  address4: formData['Ward of Residence'],           
-                  address5: formData['Sub Location'],    
-                  address6: formData['Location'],       
-                  cityVillage: formData['Village'],    
-                  countyDistrict: formData['County of Residence'],   
+                  address2: formData['Landmark'],
+                  address4: formData['Ward of Residence'],
+                  address5: formData['Sub Location'],
+                  address6: formData['Location'],
+                  cityVillage: formData['Village'],
+                  countyDistrict: formData['County of Residence'],
                   stateProvince: formData['Sub County of Residence']
                 }
               ]
@@ -248,11 +249,49 @@ export class RegistrationPage implements OnInit {
   
           this.encounterService.submitPatient(requestData).subscribe(
             async (res) => {
-              console.log('Submission successful:', res);
-          
-              const patientUuid = res.uuid;  
-              const patientName = res.display;  
-          
+              console.log('Patient submission successful:', res);
+  
+              const patientUuid = res.uuid;
+              const patientName = res.display;
+  
+              const obs = [
+                {
+                  concept: "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
+                  value: { uuid: this.conceptMap['Marital Status'][formData['Marital Status']] }
+                },
+                {
+                  concept: "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
+                  value: { uuid: this.conceptMap['Education Level'][formData['Education Level']] }
+                },
+                {
+                  concept: "1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
+                  value: { uuid: this.conceptMap['Occupation'][formData['Occupation']] }
+                }
+              ];
+
+              const encounterPayload = {
+                patient: patientUuid,
+                encounterType: "de1f9d67-b73e-4e1b-90d0-036166fc6995",
+                location: "c149692f-fb6f-4f5c-822c-144e52ef50f8",
+                encounterProviders: [
+                  {
+                    provider: "75e10c41-5fbd-404a-95e4-54af210c0371", 
+                    encounterRole: "a0b03050-c99b-11e0-9572-0800200c9a66"
+                  }
+                ],
+                form: "add7abdc-59d1-11e8-9c2d-fa7ae01bbebc",
+                obs: obs
+              };
+  
+              this.encounterService.submitEncounter(encounterPayload).subscribe(
+                (encounterRes) => {
+                  console.log('Encounter submitted:', encounterRes);
+                },
+                (err) => {
+                  console.error('Error submitting encounter:', err);
+                }
+              );
+  
               const alert = await this.alertController.create({
                 header: 'Success',
                 message: 'Patient registered successfully!',
@@ -260,10 +299,10 @@ export class RegistrationPage implements OnInit {
                   {
                     text: 'Would you like to proceed to Check In?',
                     handler: () => {
-                      const parts = patientName.split(' - ');  
-                      const idPart = parts[0];  
-                      const cleanName = parts[1];  
-          
+                      const parts = patientName.split(' - ');
+                      const idPart = parts[0];
+                      const cleanName = parts[1];
+  
                       console.log('Navigating to Screening with:', patientUuid, idPart, cleanName);
                       this.navCtrl.navigateForward(`/visit/${patientUuid}/${idPart}/${cleanName}`);
                     }
@@ -276,14 +315,13 @@ export class RegistrationPage implements OnInit {
                   }
                 ]
               });
-          
+  
               await alert.present();
             },
             (err) => {
               console.error('Error submitting patient:', err);
             }
           );
-          
         } else {
           console.error("No identifier received.");
         }

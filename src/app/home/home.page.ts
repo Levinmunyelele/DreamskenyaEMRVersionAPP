@@ -29,6 +29,8 @@ export class HomePage implements OnInit {
   selectedLocationId: string = ''; 
   locations: any[] = [];
   hideSearchButton!: boolean;
+  isPatientCheckedIn: boolean = false;
+
 
   constructor(
     private roleService: RoleService,
@@ -42,7 +44,6 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.setGreeting();
     this.setDate();
-    // this.getWeatherByLocation();
     this.loadVisits();
     this.loadLocations(); 
 
@@ -68,36 +69,6 @@ export class HomePage implements OnInit {
     };
     this.currentDate = new Date().toLocaleDateString(undefined, options);
   }
-
-  // getWeatherByLocation() {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         const { latitude, longitude } = position.coords;
-  //         this.roleService.getWeatherByCoordinates(latitude, longitude).subscribe({
-  //           next: (response) => {
-  //             this.temperature = response.current.temp_c;
-  //             this.condition = response.current.condition.text;
-  //             this.iconUrl = `https:${response.current.condition.icon}`;
-  //             this.locationName = response.location.name; 
-  //           },
-  //           error: () => {
-  //             this.temperature = 'Unavailable';
-  //             this.condition = 'Unavailable';
-  //             this.iconUrl = '';
-  //             this.locationName = 'Location not found';
-  //           },
-  //         });
-  //       },
-  //       (error) => {
-  //         this.locationError = 'Location access denied. Please allow location access.';
-  //         console.error('Geolocation error:', error);
-  //       }
-  //     );
-  //   } else {
-  //     this.locationError = 'Geolocation is not supported by this browser.';
-  //   }
-  // }
 
   loadLocations() {
     this.locationService.getLocations().subscribe({
@@ -167,17 +138,21 @@ export class HomePage implements OnInit {
   
     const uuid = patient.uuid;
     const name = patient.person.display || "Unknown";
-    const age = patient.person.age 
-    
+    const age = patient.person.age;
+  
     let idPart = "N/A"; 
     if (patient.identifiers && patient.identifiers.length > 0) {
-      idPart = patient.identifiers[0].identifier; 
+      idPart = patient.identifiers[0].identifier;
     }
   
-    this.navCtrl.navigateForward(`/patients/${uuid}/${idPart}/${age}/${encodeURIComponent(name)}`);
+    this.isPatientCheckedIn = patient.hasActiveVisit;
+  
+    if (this.isPatientCheckedIn) {
+      this.navCtrl.navigateForward(`/service-uptake/${uuid}`);
+    } else {
+      this.navCtrl.navigateForward(`/patients/${uuid}/${idPart}/${age}/${encodeURIComponent(name)}`);
+    }
   }
-  
-  
   
   goToScreeningPage(patientUuid: string, name: string): void {
     const idPart = name.split(' - ')[0]; 

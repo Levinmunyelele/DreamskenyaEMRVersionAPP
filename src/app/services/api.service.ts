@@ -6,9 +6,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  // private url = '  https://dreams-kenyaemr.healthstrat.co.ke/openmrs/ws/rest/v1/';
-  private url = 'http://localhost:8080/openmrs/ws/rest/v1/';
-  private url2 = 'http://localhost:8080/openmrs/ws/fhir2/R4/';
+  private url = '  https://dreams-kenyaemr.healthstrat.co.ke/openmrs/ws/rest/v1/';
+  // private url = 'http://localhost:8080/openmrs/ws/rest/v1/';
+  // private url2 = 'http://localhost:8080/openmrs/ws/fhir2/R4/';
+  private url2 = '  https://dreams-kenyaemr.healthstrat.co.ke/openmrs/ws/fhir2/R4/';
+
 
   constructor(private http: HttpClient) {}
 

@@ -82,7 +82,7 @@ export class BehaviouralModalPage implements OnInit {
               if (option) {
                 control.setValue(option.value);
               }
-            } else if (question.type === 'dropdown' && question.options) { // Add this condition for 'select'
+            } else if (question.type === 'dropdown' && question.options) { 
               const option = question.options.find((opt) => opt.label === value);
               if (option) {
                 control.setValue(option.value);

@@ -2,7 +2,7 @@
   --width: 80%;
   --max-width: 500px;
   --height: auto;
-  --border-radius: 15px;
+  --border-radius: 8px;
   --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   --background: white;
   --top: 15%;
@@ -13,16 +13,14 @@
   justify-content: center;
 }
 
-/* Ensure modal appears as a pop-up on smaller screens */
 @media screen and (max-width: 500px) {
   ::ng-deep .popup-modal {
-    --width: 90%;
-    --max-width: 90%;
-    --height: 70vh;
+    --width: 105%;
+    --max-width: 200%;
+    --height: 100vh;
     --top: 10%;
   }
 }
-
 /* Dimmed backdrop */
 .popup-modal::part(backdrop) {
   background: rgba(0, 0, 0, 0.4);

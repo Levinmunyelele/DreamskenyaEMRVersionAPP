@@ -351,16 +351,15 @@ export class BusinessFollowUpComponent implements OnInit {
               return null;
             }
             if (typeof value === 'number' && isNaN(value)) {
-              return null; // Skip NaN numbers
+              return null; 
             }
   
-            // If value is valid, create observation object
             return { concept: question.concept, value: value };
           }
   
           return null;
         })
-        .filter(Boolean); // Filter out null values
+        .filter(Boolean); 
     };
   
     const obs = [

@@ -196,3 +196,8 @@ ion-content {
 ion-button {
   margin-top: 10px;
 }
+
+.inactive-card {
+  opacity: 0.5;
+  pointer-events: none; /* Disable interactions */
+}
