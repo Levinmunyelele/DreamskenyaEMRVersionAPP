@@ -1,51 +1,54 @@
 .header-container {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  .form-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #1d434e;
-  }
-  
-  .service-list-card {
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-title {
-    font-size: 1.0rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .card-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .small-card {
-    border-radius: 8px;
-    padding: 10px;
-    background: #f8f9fa;
-    transition: 0.3s ease-in-out;
-  }
-  
-  .small-card:hover {
-    background: #e0f7fa;
-    transform: scale(1.02);
-  }
-  
-  .card-content {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
-  .intervention-date {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #444;
-  }
-  
+  text-align: center;
+  margin-bottom: 8px; /* Reduced margin */
+}
+
+.form-title {
+  font-size: 1.5rem; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced gap between cards */
+}
+
+.small-card {
+  border: 1px solid #dcdcdc; /* Light grey border */
+  border-radius: 10px; /* Slightly smaller border-radius */
+  padding: 10px; /* Reduced padding */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03); /* Soft shadow for depth */
+}
+
+.card-title {
+  font-size: 16px; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e; /* Your preferred color */
+  margin-bottom: 6px; /* Reduced margin */
+}
+.cards-title {
+  font-size: 12px; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e; /* Your preferred color */
+  margin-bottom: 6px; /* Reduced margin */
+}
+
+.card-content {
+  font-size: 12px; /* Smaller font size */
+}
+
+.intervention-date {
+  margin-bottom: 10px; /* Reduced margin */
+  color: #444;
+}
+
+ion-button.edit-btn {
+  --border-radius: 6px; /* Smaller border-radius */
+  --padding-start: 12px; /* Reduced padding */
+  --padding-end: 12px; /* Reduced padding */
+  font-weight: 500;
+  font-size: 12px; /* Smaller font size */
+}

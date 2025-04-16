@@ -244,8 +244,12 @@ export class HomeVisitComponent implements OnInit {
 
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
 
-  constructor(private modalCtrl: ModalController,
+  constructor(
+    private modalCtrl: ModalController,
     private fb: FormBuilder,
     private router: Router,
     private encounterService: EncounterService,
@@ -299,20 +303,24 @@ export class HomeVisitComponent implements OnInit {
       });
     });
 
-    this.patientData = this.navParams.get('patientData');
-    this.enrollmentData = this.navParams.get('enrollmentData');
-    this.encounterData = this.navParams.get('encounterData');
-    this.visitType = this.navParams.get('visitType');
+    this.activeVisit = this.navParams.get('activeVisit');
     this.encounterType = this.navParams.get('encounterType');
     this.form = this.navParams.get('form');
+    this.patientData = this.navParams.get('patientData');
+    this.visitType = this.navParams.get('visitType');
+    this.location = this.navParams.get('location');
+    this.patientUuid = this.navParams.get('patientUuid');
+    this.encounter = this.navParams.get('encounter');
 
     console.log("Modal Data Received:", {
-      patientData: this.patientData,
-      enrollmentData: this.enrollmentData,
-      encounterData: this.encounterData,
-      visitType: this.visitType,
+      activeVisit: this.activeVisit,
       encounterType: this.encounterType,
-      form: this.form
+      form: this.form,
+      patientData: this.patientData,
+      visitType: this.visitType,
+      location: this.location,
+      patientUuid: this.patientUuid,
+      encounter: this.encounter
     });
 
     if (this.encounter) {
@@ -362,9 +370,8 @@ export class HomeVisitComponent implements OnInit {
               control.setValue(value);
             }
 
-            // Handle visibility based on dependencies
-            if ('dependsOn' in question && question.dependsOn) { // Type guard
-              const dependencyControl = this.homeForm.get(question.dependsOn as string); // Explicit cast
+            if ('dependsOn' in question && question.dependsOn) { 
+              const dependencyControl = this.homeForm.get(question.dependsOn as string); 
               if (dependencyControl) {
                 if (dependencyControl.value === '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
                   this.visibleFields[question.concept] = true;
@@ -419,77 +426,95 @@ export class HomeVisitComponent implements OnInit {
       console.error('Patient data is missing');
       return;
     }
-
+  
     if (!this.questions || !this.secondSection) {
-      console.warn('One or more question sections are missing, skipping form submission.');
+      console.warn('One or more question sections are missing. Skipping form submission.');
       return;
     }
-
+  
     if (!this.homeForm || !this.secondFormGroup) {
       console.error('One or more form groups are missing.');
       return;
     }
-
-
+  
     const extractObs = (questions: any[], formGroup: any) => {
       return questions
         .map((question) => {
           let value = formGroup.value[question.concept];
-
-          if (value !== null && value !== undefined && value !== '') {
-            if (['dropdown', 'radio'].includes(question.type)) {
+  
+          if (value !== null && value !== undefined) {
+            if (typeof value === 'string' && value.trim() === '') return null;
+            if (Array.isArray(value) && value.length === 0) return null;
+            if (typeof value === 'number' && isNaN(value)) return null;
+  
+            // For simple types
+            if (
+              ['dropdown', 'radio', 'text', 'textarea', 'number', 'date'].includes(question.type)
+            ) {
               return { concept: question.concept, value: value };
             }
-            if (['text', 'textarea'].includes(question.type)) {
-              return { concept: question.concept, value: value };
-            }
-
-            if (question.type === 'number') {
-              return { concept: question.concept, value: value };
-            }
-
-            if (question.type === 'date') {
-              return { concept: question.concept, value: value };
-            }
-
+  
             return { concept: question.concept, value };
           }
-
+  
           return null;
         })
-        .filter(Boolean)
+        .filter(Boolean);
     };
-
-
-
-    const obs = [
+  
+    const allObs = [
       ...extractObs(this.questions, this.homeForm),
       ...extractObs(this.secondSection, this.secondFormGroup),
-
     ];
-
+  
+    const patientUuid = this.patientData.uuid;
+    const visitUuid = this.activeVisit?.uuid || null;
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+    const encounterUuid = this.encounter?.uuid || null;  // Check if encounterUuid exists
+  
+    if (!locationUuid) {
+      console.error('Location UUID is missing. Cannot proceed.');
+      return;
+    }
+  
     const payload = {
-      patient: this.patientData.uuid,
-      visit: this.visitType || null,
+      patient: patientUuid,
+      visit: visitUuid,
       encounterType: this.encounterType,
-      form: this.form,
-      obs: obs,
+      form: this.form || 'default-form-uuid',
+      obs: allObs,
       orders: [],
       diagnoses: [],
-      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+      location: locationUuid,
     };
-
+  
     console.log('Payload to be sent:', payload);
-
-    this.encounterService.submitEncounter(payload).subscribe(
-      (response) => {
-        console.log('API Response:', response);
-        this.modalCtrl.dismiss({ refresh: true, data: response });
-      },
-      (error) => {
-        console.error('API Error:', error);
-        this.modalCtrl.dismiss({ refresh: false, error: error });
-      }
-    );
+  
+    if (encounterUuid) {
+      // If encounterUuid exists, update the existing encounter
+      this.encounterService.updateEncounter(encounterUuid, payload).subscribe(
+        (response) => {
+          console.log('Encounter updated successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('Error updating encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    } else {
+      // If encounterUuid doesn't exist, create a new encounter
+      this.encounterService.submitEncounter(payload).subscribe(
+        (response) => {
+          console.log('New encounter created successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('Error submitting encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    }
   }
+  
 }  

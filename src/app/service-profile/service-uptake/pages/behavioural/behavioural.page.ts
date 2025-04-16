@@ -18,7 +18,8 @@ export class BehaviouralPage implements OnInit {
   form: string = "";
   encounters: any[] = [];
   interventionDisplay = 'DREAMS Behavioural Intervention';
-  
+  activeVisit: any;
+
 
 
   constructor(
@@ -40,34 +41,30 @@ export class BehaviouralPage implements OnInit {
       backdropDismiss: true,
       componentProps: {
         patientData: this.patientData,
-        enrollmentData: this.enrollmentData,
-        encounterData: this.encounterData,
-        visitType: this.visitType,
+        activeVisit: this.activeVisit,
+        encounter: encounter,
         encounterType: this.encounterType,
         form: this.form,
-        encounter: encounter
+        visitType: this.activeVisit?.visitType,
+        location: this.activeVisit?.location,
+        patientUuid: this.patientData?.uuid || this.activeVisit?.patient?.uuid 
+      }
+    });
 
-      }
-    });
-  
     modal.onDidDismiss().then((result) => {
-      if (result.data) {
-        console.log('Response from modal:', result.data);
-        if (result.data.refresh) {
-          this.fetchEncounters();
-        } else {
-          this.updateEncounterDetails(result.data); 
-        }
+      if (result.data?.refresh) {
+        this.fetchEncounters();
       }
     });
-  
+
     await modal.present();
   }
-  
+
+
   updateEncounterDetails(response: any) {
     this.encounterData = response;
   }
-  
+
   getIntervention(obs: any[]): string {
     const intervention = obs.find(o => o.display.includes(this.interventionDisplay));
     if (intervention) {
@@ -81,25 +78,39 @@ export class BehaviouralPage implements OnInit {
       return `No ${this.interventionDisplay}`;
     }
   }
-  
+
   getInterventionDate(obs: any[]): string {
     const interventionDate = obs.find(o => o.display.includes('DREAMS Intervention Date'));
     return interventionDate ? interventionDate.obsDatetime : 'No Date Available';
   }
-  
+
   fetchEncounters() {
-    if (!this.patientData?.uuid || !this.encounterType) {
-      console.warn("Missing patient UUID or encounter type");
+    const patientUuid = this.activeVisit?.patient?.uuid;
+    const encounterType = this.encounterType;
+    console.log('pat',patientUuid)
+
+    if (!patientUuid || !encounterType) {
+      console.warn("Missing patient UUID from activeVisit or encounter type", {
+        patientUuid,
+        encounterType,
+      });
       return;
     }
-  
-    this.encounterService.getEncounters(this.patientData.uuid, this.encounterType).subscribe(
+
+    console.log("Fetching encounters for patient UUID:", patientUuid);
+    this.encounterService.getEncounters(patientUuid, encounterType).subscribe(
       (encounters) => {
         if (encounters.length > 0) {
-          this.encounters = encounters.filter(encounter => {
-            return encounter.obs && encounter.obs.some((obs: { display: string | string[]; }) => obs.display.includes(this.interventionDisplay));
-          });
-  
+          this.encounters = encounters.filter(encounter =>
+            encounter.obs && encounter.obs.some((obs: { display: string | string[] }) => {
+              if (Array.isArray(obs.display)) {
+                return obs.display.some((d) => d.includes(this.interventionDisplay));
+              }
+              return obs.display.includes(this.interventionDisplay);
+            })
+          );
+          
+
           console.log("Fetched and Filtered Encounters:", this.encounters);
         } else {
           this.encounters = [];
@@ -111,38 +122,22 @@ export class BehaviouralPage implements OnInit {
       }
     );
   }
-  
+
+
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      if (params['data']) {
-        this.patientData = JSON.parse(params['data']);
-      }
-      if (params['enrollmentData']) {
-        this.enrollmentData = JSON.parse(params['enrollmentData']);
-      }
-      if (params['encounterData']) {
-        this.encounterData = JSON.parse(params['encounterData']);
-      }
-      if (params['visit']) {
-        this.visitType = params['visit'];
-      }
-      if (params['encounterType']) {
-        this.encounterType = params['encounterType'];
-      }
-      if (params['form']) {
-        this.form = params['form'];
-      }
-      console.log("Received Data in Behavioural Page:", {
-        patientData: this.patientData,
-        enrollmentData: this.enrollmentData,
-        encounterData: this.encounterData,
-        visitType: this.visitType,
-        encounterType: this.encounterType,
-        form: this.form
-      });
-    });
+    const navState = window.history.state;
+    this.activeVisit = navState.activeVisit;
+    this.encounterType = navState.encounterType;
+    this.form = navState.form
+    this.patientData = navState.patientData,
+
+
+      console.log("Active Visit:", this.activeVisit);
+    console.log("Patient UUID from Active Visit:", this.activeVisit?.patient?.uuid);
+    console.log("Encounter Type:", this.encounterType);
+    console.log('patient data', this.patientData)
 
     this.fetchEncounters();
-
   }
+
 }

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ModalController, NavController } from '@ionic/angular';
 import { EncounterService } from '../services/encounter.service';
+import { VisitPage } from '../visit/visit.page';
 import { forkJoin, Observable } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-screening',
   templateUrl: './screening.page.html',
-  styleUrls: ['./screening.page.scss']
+  styleUrls: ['./screening.page.scss'],
 })
 export class ScreeningPage implements OnInit {
   loading: boolean = false;
@@ -15,9 +17,13 @@ export class ScreeningPage implements OnInit {
   searchQuery: string = '';
   dreamsProgramUuid = 'c6a2e0c1-38b1-4474-9bfe-fe4df3680183';
 
-  constructor(private router: Router, private encounterService: EncounterService) { }
+  constructor(
+    private encounterService: EncounterService,
+    private modalCtrl: ModalController,
+    private navCtrl: NavController
+  ) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   searchPatients() {
     if (!this.searchQuery.trim()) return;
@@ -64,7 +70,7 @@ export class ScreeningPage implements OnInit {
   }
 
   private processEnrollmentResults(patients: any[], enrollmentResults: any[]) {
-    this.patientSearchResults = [];
+    const dreamsPatients: any[] = [];
 
     patients.forEach((patient, index) => {
       const enrollments = enrollmentResults[index]?.results || [];
@@ -73,12 +79,35 @@ export class ScreeningPage implements OnInit {
       );
 
       if (isEnrolledInDreams) {
-        this.patientSearchResults.push(this.formatPatientData(patient));
+        dreamsPatients.push(patient);
       }
     });
 
-    this.noResults = this.patientSearchResults.length === 0;
-    this.loading = false;
+    if (dreamsPatients.length === 0) {
+      this.handleNoResults();
+      return;
+    }
+
+    const dreamsPatientUuids = dreamsPatients.map(p => p.uuid);
+
+    this.encounterService.getPatientsVisits(dreamsPatientUuids).subscribe((visits: any[]) => {
+      this.patientSearchResults = dreamsPatients.map(patient => {
+        const visit = visits.find(v => v.patient.uuid === patient.uuid);
+        const hasActiveVisit = visit ? !visit.stopDatetime : false;
+
+        return {
+          ...this.formatPatientData(patient),
+          hasActiveVisit,
+          activeVisit: visit || null,
+        };
+      });
+
+      this.noResults = this.patientSearchResults.length === 0;
+      this.loading = false;
+    }, (err) => {
+      console.error('Error loading visit data:', err);
+      this.loading = false;
+    });
   }
 
   private formatPatientData(patient: any) {
@@ -96,20 +125,70 @@ export class ScreeningPage implements OnInit {
     return date ? date.split('T')[0] : 'Unknown';
   }
 
-  viewPatient(patient: any) {
-    console.log('Patient Data:', patient);
+  async checkIn(patientUuid: string, name: string, patient: any) {
+    console.log('Patient Data (in checkIn):', patient);
 
-    const idPart = patient.dreamsId?.trim() || 'N/A';
-    const cleanName = encodeURIComponent(patient.name?.trim() || 'Unknown');
+    const cleanName = name.split(' - ')[1] || name;
 
-    console.log('Navigating to:', `/visit/${patient.uuid}/${idPart}/${cleanName}`);
-
-    this.router.navigate(['/visit', patient.uuid, idPart, cleanName], {
-      queryParams: { patientData: JSON.stringify(patient.rawData) },
+    const modal = await this.modalCtrl.create({
+      component: VisitPage,
+      componentProps: {
+        patientUuid,
+        patientName: cleanName,
+        patientData: patient,
+      },
+      breakpoints: [0, 0.5, 1],
     });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data?.checkedIn && data?.visit) {
+      console.log('✅ Patient Data:', patient);
+      console.log('📌 Updated visit data:', data.visit);
+    
+      this.navCtrl.navigateForward(`/service-uptake/${patientUuid}`, {
+        state: { 
+          patientData: patient,
+          activeVisit: data.visit
+        },
+      });
+    
+    } else if (data?.checkedIn) {
+      console.log('✅ Patient Data:', patient);
+      console.log('⚠️ No visit data returned, but patient was checked in.');
+    
+      this.navCtrl.navigateForward(`/service-uptake/${patientUuid}`, {
+        state: { 
+          patientData: patient,
+          activeVisit: data.visit // could be null or undefined
+        },
+      });
+    
+    } else {
+      console.log('❌ Patient was not checked in.');
+    }
   }
 
+  // Updated viewPatient method with check for active visit
+  viewPatient(patient: any) {
+    console.log('Viewing patient:', patient);
 
+    // Check if the patient has an active visit
+    if (patient.hasActiveVisit) {
+      console.log('Patient has an active visit, navigating to service uptake...');
+      this.navCtrl.navigateForward(`/service-uptake/${patient.uuid}`, {
+        state: { 
+          patientData: patient.rawData, // Passing the patient data
+          visitData: patient.activeVisit // Passing the active visit data
+        },
+      });
+    } else {
+      console.log('No active visit, opening VisitPage modal...');
+      this.checkIn(patient.uuid, patient.name, patient);
+    }
+  }
 
   getAge(dob: string): number {
     if (!dob) return 0;
@@ -126,5 +205,21 @@ export class ScreeningPage implements OnInit {
       age--;
     }
     return age;
+  }
+
+  // Debounce search on input
+  onSearchChange(event: any): void {
+    const query = event.target.value;
+    this.searchQuery = query;
+
+    // Implement debounce by delaying the search for 300ms
+    if (query.trim()) {
+      this.loading = true;
+      this.searchPatients();  // Call searchPatients when query changes
+    } else {
+      this.patientSearchResults = [];  // Clear results if query is empty
+      this.noResults = false;
+      this.loading = false;
+    }
   }
 }

@@ -41,7 +41,7 @@ export class LoginPage implements OnInit {
 
         localStorage.setItem('currentProviderDisplay', currentProviderDisplay);
 
-        this.router.navigate(['/home']);
+        this.router.navigate(['/homy']);
       }
     }).catch(error => {
       this.loading = false;

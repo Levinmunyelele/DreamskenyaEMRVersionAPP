@@ -8,7 +8,6 @@ import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 
-
 @Component({
   selector: 'app-visit',
   templateUrl: './visit.page.html',
@@ -17,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 export class VisitPage implements OnInit {
   @Input() patientUuid!: string;
   @Input() patientName!: string;
+  @Input() patientData: any; // Accept incoming patientData from home page
 
   visitForm!: FormGroup;
   questions: any[] = [];
@@ -25,7 +25,7 @@ export class VisitPage implements OnInit {
   attributes: any;
   idPart!: string;
   cleanName!: string;
-  patientData: any;
+  activeVisit: any;
  
   constructor(
     private modalCtrl: ModalController,
@@ -35,13 +35,13 @@ export class VisitPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private route: ActivatedRoute
-
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.initializeForm();
     this.fetchDropdownData();
 
+    // Process route parameters and query data if they exist
     this.route.paramMap.subscribe(params => {
       const patientUuid = params.get('patientUuid');
       const idPart = params.get('idPart');
@@ -49,7 +49,6 @@ export class VisitPage implements OnInit {
 
       this.route.queryParams.subscribe(queryParams => {
         let cleanNameFromQuery = queryParams['cleanName'];
-
         if (cleanNameFromQuery) {
           this.cleanName = decodeURIComponent(cleanNameFromQuery);
         } else if (cleanNameFromParams) {
@@ -59,9 +58,8 @@ export class VisitPage implements OnInit {
         } else {
           this.cleanName = 'Unknown';
         }
-
         console.log('Final cleanName:', this.cleanName);
-      })
+      });
 
       if (patientUuid && idPart) {
         this.patientUuid = patientUuid;
@@ -71,15 +69,14 @@ export class VisitPage implements OnInit {
       console.log('patientUuid:', this.patientUuid);
       console.log('idPart:', this.idPart);
       console.log('cleanName:', this.cleanName);
-
     });
 
+    // Retrieve patientData if passed from query params or use provided Input
     this.route.queryParams.subscribe(params => {
       if (params['patientData']) {
         this.patientData = JSON.parse(params['patientData']);
         console.log('Retrieved Patient Data:', this.patientData);
       } else {
-        // fallback if patientData is not passed
         this.patientData = {
           uuid: this.patientUuid,
           idPart: this.idPart,
@@ -89,11 +86,13 @@ export class VisitPage implements OnInit {
       }
     });
     
+    // Set attributes (if applicable)
     this.attributes = [
       { attributeType: '3b9dfac8-9e4d-11ee-8c90-0242ac120002', value: 'false' },
       { attributeType: 'e6cb0c3b-04b0-4117-9bc6-ce24adbda802', value: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74' }
     ];
 
+    // Set listeners on form controls to update component properties
     this.visitForm.get('visitLocation')?.valueChanges.subscribe((value) => {
       this.location = value;
     });
@@ -102,6 +101,7 @@ export class VisitPage implements OnInit {
       this.visitType = value;
     });
   }
+
   initializeForm() {
     const now = new Date();
     const visitDate = now.toISOString().split('T')[0];
@@ -109,7 +109,6 @@ export class VisitPage implements OnInit {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const meridian = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12 || 12;
-
     const visitTime = `${hours.toString().padStart(2, '0')}:${minutes}`;
 
     this.visitForm = this.fb.group({
@@ -119,13 +118,16 @@ export class VisitPage implements OnInit {
       visitLocation: new FormControl('', Validators.required),
       visitationType: new FormControl('', Validators.required)
     });
-
   }
 
   goBack() {
-    this.modalCtrl.dismiss();
-  }  
-
+    this.modalCtrl.dismiss().then(() => {
+      console.log("Modal dismissed successfully");
+    }).catch((error) => {
+      console.error("Error dismissing modal", error);
+    });
+  }
+  
   fetchDropdownData() {
     forkJoin({
       visitLocations: this.locationService.getLocations(),
@@ -137,16 +139,15 @@ export class VisitPage implements OnInit {
 
         const visitLocationOptions = Array.isArray(visitLocations.results)
           ? visitLocations.results.map((location: { display: any; uuid: any; }) => ({
-            label: location.display,
-            value: location.uuid,
-          }))
+              label: location.display,
+              value: location.uuid,
+            }))
           : [];
-
         const visitationTypeOptions = Array.isArray(visitationTypes.results)
           ? visitationTypes.results.map((type: { display: any; uuid: any; }) => ({
-            label: type.display,
-            value: type.uuid,
-          }))
+              label: type.display,
+              value: type.uuid,
+            }))
           : [];
 
         this.questions = [
@@ -175,7 +176,6 @@ export class VisitPage implements OnInit {
             type: "dropdown",
             options: visitationTypeOptions,
           },
-
         ];
         this.initForm();
       },
@@ -185,10 +185,8 @@ export class VisitPage implements OnInit {
     );
   }
 
-
   initForm() {
     this.visitForm = this.fb.group({});
-
     this.questions.forEach((question) => {
       this.visitForm.addControl(question.key, new FormControl('', Validators.required));
     });
@@ -198,15 +196,12 @@ export class VisitPage implements OnInit {
         this.location = value;
       }
     });
-
     this.visitForm.get('visitationType')?.valueChanges.subscribe((value) => {
       if (value) {
         this.visitType = value;
       }
     });
   }
-
-
 
   closeModal() {
     this.modalCtrl.dismiss();
@@ -220,84 +215,53 @@ export class VisitPage implements OnInit {
       return;
     }
   
-    this.visitService.getVisitHistory(this.patientUuid).subscribe({
-      next: (visitHistory) => {
-        console.log("Visit history response:", visitHistory);
+    const now = new Date();
+    const visitPayload = {
+      startDatetime: now.toISOString(),
+      location: this.location,
+      visitType: this.visitType,
+      patient: this.patientUuid,   
+      attributes: this.attributes,
+    };
+    
+    this.visitService.postVisitQueueEntry(visitPayload).subscribe({
+      next: (response) => {
+        console.log('Visit successfully submitted:', response);
   
-        const hasVisitedBefore = visitHistory?.results?.length > 0;
+        const patientUuid = response.patient?.uuid;
+        const idPart = response.patient?.display.split(' - ')[0].trim();
+        let patientName = response.patient?.display.split(' - ')[1]?.trim();
   
-        const visitPayload = {
-          patient: this.patientUuid,
-          startDatetime: new Date().toISOString().split('.')[0] + ".000Z",
-          visitType: this.visitType,
-          location: this.location,
-          attributes: []
+        if (!patientUuid || !idPart || !patientName) {
+          console.error('Missing required data from visit response:', response);
+          return;
+        }
+  
+        const updatedPatientData = {
+          ...this.patientData,
+          uuid: patientUuid,
+          idPart: idPart,
+          name: patientName,
         };
   
-        this.visitService.postVisitQueueEntry(visitPayload).subscribe({
-          next: (response) => {
-            console.log('Visit successfully submitted:', response);
+        this.activeVisit = {
+          ...response,
+          isActive: true
+        };
   
-            const patientUuid = response.patient?.uuid;
-            const idPart = response.patient?.display.split(' - ')[0].trim();
-            let patientName = response.patient?.display.split(' - ')[1]?.trim();
-  
-            if (!patientUuid || !idPart || !patientName) {
-              console.error('Missing required data:', response);
-              return;
-            }
-  
-            const cleanName = encodeURIComponent(patientName);
-            const visitDate = visitPayload.startDatetime;
-            const locationUuid = visitPayload.location;
-            const stringifiedData = JSON.stringify(this.patientData);
-  
-            if (hasVisitedBefore) {
-              console.log(`Navigating to Service Uptake with: ${patientUuid}, ${idPart}, ${cleanName}`);
-              this.router.navigate([`/service-uptake`, patientUuid], {
-                queryParams: {
-                    visitId: response.uuid,
-                    date: visitDate,
-                    location: locationUuid,
-                    visitType: this.visitType,
-                    cleanName,
-                    data: stringifiedData
-                }
-              });
-  
-            } else {
-              console.log(`Navigating to Screening with: ${patientUuid}, ${idPart}, ${cleanName}`);
-  
-              this.router.navigate([`/service-uptake`, patientUuid], {
-                queryParams: {
-                  visitId: response.uuid,
-                  date: visitDate,
-                  location: locationUuid,
-                  visitType: this.visitType,
-                  cleanName,
-                  data: JSON.stringify(this.patientData)
-                },
-                replaceUrl: true
-              });
-              
-  
-              setTimeout(async () => {
-                const alert = await this.alertController.create({
-                  header: 'Check-in Successful',
-                  message: 'The patient has been successfully checked in. Would you like to proceed to screening?',
-                  buttons: [{ text: 'OK' }]
-                });
-                await alert.present();
-              }, 1000); 
-            }
-          },
-          error: (error) => {
-            console.error('Error submitting visit:', error);
-          }
+        this.modalCtrl.dismiss({
+          checkedIn: true,
+          visit: this.activeVisit,
+          updatedPatient: updatedPatientData
         });
       },
-      error: (error) => {
-        console.error('Error fetching visit history:', error);
+      error: (err) => {
+        console.error('Error submitting visit:', err);
+        this.alertController.create({
+          header: 'Error',
+          message: 'There was a problem submitting the visit. Please try again.',
+          buttons: ['OK']
+        }).then(alert => alert.present());
       }
     });
   }

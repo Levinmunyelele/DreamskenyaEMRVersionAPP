@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
-import { map, Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
@@ -33,10 +34,40 @@ export class EncounterService {
       map((response: { results: any[] }) => response.results || [])
     );
   } 
+
+  getAllPatientEncounters(patientUuid: string): Observable<any[]> {
+    if (!patientUuid) {
+      console.warn("Missing patient UUID");
+      return new Observable((observer) => {
+        observer.next([]);
+        observer.complete();
+      });
+    }
+
+    return this.apiService.get(`encounter?patient=${patientUuid}`).pipe(
+      map((response: any) => response?.results || [])
+    );
+  }
+  getEncounterByUuid(encounterUuid: string): Observable<any> {
+    if (!encounterUuid) {
+      console.warn("Missing encounter UUID");
+      return new Observable((observer) => {
+        observer.next(null);
+        observer.complete();
+      });
+    }
+    return this.apiService.get(`encounter/${encounterUuid}?v=full`);
+  }
   
   submitEncounter(payload: any): Observable<any> {
     return this.apiService.post('encounter', payload);  
   }
+
+  updateEncounter(encounterUuid: string, payload: any): Observable<any> {
+    return this.apiService.post(`encounter/${encounterUuid}`, payload);
+  }  
+  
+
   submitEnrollment(payload: any): Observable<any> {
     return this.apiService.post('programenrollment', payload);
   }
@@ -52,6 +83,7 @@ export class EncounterService {
   getPatientProgramEnrollments(patientUuid: string): Observable<any> {
     return this.apiService.get(`programenrollment?patient=${patientUuid}&v=full`);
   }
+
   getPatientsVisits(patientUuids: string[]): Observable<any[]> {
     if (patientUuids.length === 0) {
       return new Observable((observer) => {
@@ -104,5 +136,4 @@ export class EncounterService {
   
     return patients;
   }
-  
 }

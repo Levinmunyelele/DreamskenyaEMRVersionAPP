@@ -16,34 +16,50 @@
   </div>
 
   <!-- Service List Card -->
-  <ion-card class="service-list-card">
     <ion-card-header>
       <ion-card-title class="card-title">Service List</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
       <div class="card-container">
-        <ion-card *ngFor="let encounter of encounters" class="small-card" (click)="openModal(encounter)">
-          <ion-card-header class="card-header">
-            <ion-card-title class="card-title">
+        <ion-card *ngFor="let encounter of encounters" class="small-card">
+          <ion-card-header>
+            <ion-card-title class="cards-title">
               {{ getIntervention(encounter.obs) }}
             </ion-card-title>
           </ion-card-header>
+    
           <ion-card-content class="card-content">
             <p class="intervention-date">
-              <strong>Intervention Date:</strong> 
-              {{ getInterventionDate(encounter.obs) | date:'medium' }}
+              <strong>Service Uptake Offered On:</strong><br />
+              {{ getInterventionDate(encounter.obs) | date: 'mediumDate' }}
             </p>
+    
+            <ion-button
+              expand="block"
+              fill="outline"
+              size="small"
+              color="primary"
+              (click)="openModal(encounter)">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Edit Service
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </div>
+      <ion-card *ngIf="encounters.length === 0" class="small-card no-service-card">
+        <ion-card-content class="card-content ion-text-center">
+          <ion-icon name="information-circle-outline" size="large" color="medium"></ion-icon>
+          <p><strong>No service taken yet.</strong></p>
+        </ion-card-content>
+      </ion-card>
     </ion-card-content>
-  </ion-card>
+    
 
-  <!-- Floating Button -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary" (click)="openModal()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+        <!-- Floating Button -->
+        <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+          <ion-fab-button color="primary" (click)="openModal()">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
 </ion-content>

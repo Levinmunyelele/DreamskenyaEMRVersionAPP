@@ -20,8 +20,8 @@ export class EnrollmentPage implements OnInit {
   encounterType = '90dd679a-7f5d-4f59-9d9c-abb91abde9fa';
   programmeUuid = 'c6a2e0c1-38b1-4474-9bfe-fe4df3680183';
   formUuid = "2e8e82d6-cd35-4617-839a-6449y9e0725f3";
-
-
+  patientData: any;
+  activeVisit: any
 
 
   questions = [
@@ -109,7 +109,7 @@ export class EnrollmentPage implements OnInit {
     },
     {
       label: 'Sub County of Residence',
-      concept: '167131AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: '409c1c89-5f0c-4b5b-80c2-ba7671e48ffc',
       type: 'text'
     },
     {
@@ -844,6 +844,7 @@ export class EnrollmentPage implements OnInit {
   encounterDate: string = '';
   encounterTime: string = '';
   orders!: never[];
+  
 
   constructor(
     private fb: FormBuilder,
@@ -856,50 +857,88 @@ export class EnrollmentPage implements OnInit {
 
   ) { }
   ngOnInit() {
+    this.patientData = window.history.state.patientData;
+    this.activeVisit = window.history.state.activeVisit || window.history.state.visitData;
+
+    console.log('Patient Data in Enrollment Page:', this.patientData);
+    console.log('Active Visit Data in Enrollment Page:', this.activeVisit);
+
+    this.patientUuid = this.patientData?.uuid || '';
+    this.patientName = this.patientData?.display || '';
+
+    this.visitType = this.activeVisit?.visitType?.display || '';
+    this.locationUuid = this.activeVisit?.location?.uuid || '';
+
+    const fullName = this.patientName.split(' - ')[1] || '';
+    const nameParts = fullName.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    const person = this.patientData?.person || {};
+    const birthdate = person?.birthdate ? person.birthdate.slice(0, 10) : '';
+
+    const address = person?.addresses?.[0] || {};
+    const cityVillage = address.cityVillage || '';
+    const countyDistrict = address.countyDistrict?.trim() || '';
+    const stateProvince = address.stateProvince || '';
+    const address2 = address.address2 || '';
+    const address4 = address.address4 || '';
+    const address5 = address.address5 || '';
+    const address6 = address.address6 || '';
+
+
+    console.log('Patient UUID:', this.patientUuid);
+    console.log('Location UUID:', this.locationUuid);
+    console.log('Visit Type:', this.visitType);
+    console.log('First Name:', firstName);
+    console.log('Last Name:', lastName);
+
+
     const groupConfig: { [key: string]: any } = {
       responses: this.fb.array([]),
     };
 
-    this.route.queryParams.subscribe((queryParams) => {
-      this.patientUuid = queryParams['patientUuid'];
-      this.locationUuid = queryParams['locationUuid'];
-      this.visitType = queryParams['visitType'];
-      this.patientName = decodeURIComponent(queryParams['patientName']);
-
-      console.log('Patient UUID:', this.patientUuid);
-      console.log('Location UUID:', this.locationUuid);
-      console.log('Visit Type:', this.visitType);
-      console.log('Patient Name:', this.patientName);
-
-      const nameParts = this.patientName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      this.questions.forEach((question) => {
-        let defaultValue = '';
-
-        if (question.concept === '166102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-          defaultValue = firstName;
-        } else if (question.concept === '166103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-          defaultValue = lastName;
-        }
-
-        if (question.type === 'checkbox') {
-          groupConfig[question.concept] = this.fb.array([]);
-        } else {
-          groupConfig[question.concept] = this.fb.control(defaultValue);
-        }
-
-        (groupConfig['responses'] as FormArray).push(this.fb.control(defaultValue));
-      });
-
-      this.enrollmentForm = this.fb.group(groupConfig);
-
-      this.setupFollowUpQuestionSubscriptions();
+    this.questions.forEach((question) => {
+      let defaultValue = '';
+    
+      if (question.concept === '166102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+        defaultValue = firstName;
+      } else if (question.concept === '166103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+        defaultValue = lastName;
+      } else if (question.concept === '166575AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+        defaultValue = birthdate;
+      } else if (question.concept === '1354AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+        defaultValue = cityVillage;
+      }else if (question.concept === '167131AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' && question.type === 'dropdown' && question.options) {
+        const selectedCounty = question.options.find(
+          (option) => option.label.toLowerCase() === countyDistrict.toLowerCase()
+        );
+        defaultValue = selectedCounty?.value || '';
+      }
+       else if (question.concept === '409c1c89-5f0c-4b5b-80c2-ba7671e48ffc') {
+        defaultValue = stateProvince;
+      } else if (question.concept === '64fb6ce0-fac6-48e3-8e8e-0110b2a8724f') {
+        defaultValue = address2;
+      } else if (question.concept === 'a64fb6ce0-fac6-48e3-8e8e-0110b2a8724f') {
+        defaultValue = address4;
+      } else if (question.concept === '3e68392c-416e-4f9d-953f-5179903634d3') {
+        defaultValue = address5;
+      } else if (question.concept === '3e68392c-416e-4f9d-953f-5179903634d3') {
+        defaultValue = address6;
+      }
+      if (question.type === 'checkbox') {
+        groupConfig[question.concept] = this.fb.array([]);
+      } else {
+        groupConfig[question.concept] = this.fb.control(defaultValue);
+      }
+      
+    
+      (groupConfig['responses'] as FormArray).push(this.fb.control(defaultValue));
     });
+    
+    this.enrollmentForm = this.fb.group(groupConfig);
+
+    this.setupFollowUpQuestionSubscriptions();
   }
-
-
 
   private setupFollowUpQuestionSubscriptions() {
     const followUpQuestions = [
@@ -997,7 +1036,7 @@ export class EnrollmentPage implements OnInit {
   
     const patientUuid = this.patientUuid;
     const locationUuid = this.locationUuid;
-    const programUuid = this.programmeUuid ;
+    const programUuid = this.programmeUuid;
   
     const allowedConcepts = [
       "f122e57d-975d-4613-9a38-aa5761b37894",
@@ -1020,7 +1059,7 @@ export class EnrollmentPage implements OnInit {
   
     const obs = this.questions
       .map((question, index) => {
-        if (!allowedConcepts.includes(question.concept)) return null; 
+        if (!allowedConcepts.includes(question.concept)) return null;
   
         let value;
         if (question.type === "checkbox") {
@@ -1046,7 +1085,7 @@ export class EnrollmentPage implements OnInit {
     const encounterPayload = {
       patient: patientUuid,
       visit: this.visitType,
-      encounterType: this.encounterType ,
+      encounterType: this.encounterType,
       form: this.formUuid,
       obs: obs,
       orders: [],
@@ -1054,54 +1093,58 @@ export class EnrollmentPage implements OnInit {
       location: locationUuid,
     };
   
-    console.log("Encounter Payload:", encounterPayload);  
+    console.log("Encounter Payload:", encounterPayload);
   
-this.encounterService.submitEncounter(encounterPayload).pipe(
-  switchMap((encounterResponse: any) => {
-    console.log("Encounter submitted successfully:", encounterResponse);
+   this.encounterService.submitEncounter(encounterPayload).pipe(
+    switchMap((encounterResponse: any) => {
+      console.log("Encounter submitted successfully:", encounterResponse);
 
-    const programEnrollmentPayload = {
-      patient: patientUuid,
-      program: programUuid,
-      dateEnrolled,
-      dateCompleted: null,
-      location: locationUuid,
-    };
+      const programEnrollmentPayload = {
+        patient: patientUuid,
+        program: programUuid,
+        dateEnrolled,
+        dateCompleted: null,
+        location: locationUuid,
+      };
 
-    console.log("Submitting Program Enrollment:", programEnrollmentPayload);
+      console.log("Submitting Program Enrollment:", programEnrollmentPayload);
 
-    return this.encounterService.submitEnrollment(programEnrollmentPayload).pipe(
-      map((programEnrollmentResponse: any) => ({ encounterResponse, programEnrollmentResponse }))
-    );
-  })
-).subscribe(
-  async ({ encounterResponse, programEnrollmentResponse }) => {
-    console.log("Program enrollment successful:", programEnrollmentResponse);
+      return this.encounterService.submitEnrollment(programEnrollmentPayload).pipe(
+        map((programEnrollmentResponse: any) => ({ encounterResponse, programEnrollmentResponse }))
+      );
+    })
+  ).subscribe(
+    async ({ encounterResponse, programEnrollmentResponse }) => {
+      console.log("Program enrollment successful:", programEnrollmentResponse);
 
-    const alert = await this.alertController.create({
-      header: "Success",
-      message: "Enrollment completed successfully!",
-      buttons: [
-        {
-          text: "OK",
-          handler: () => {
-            this.router.navigate(['/service-uptake', patientUuid], {
-              queryParams: { 
-                visit: this.visitType,
-                enrollmentData: JSON.stringify(programEnrollmentResponse), 
-                encounterData: JSON.stringify(encounterResponse) 
-              }
-            });
+      // Log data that will be passed
+      console.log('Passing Patient Data:', this.patientData);
+      console.log('Passing Active Visit Data:', this.activeVisit);
+
+      const alert = await this.alertController.create({
+        header: "Success",
+        message: "Enrollment completed successfully!",
+        buttons: [
+          {
+            text: "OK",
+            handler: () => {
+              // Pass data using router state
+              this.router.navigate(['/service-uptake', patientUuid], {
+                state: {
+                  patientData: this.patientData,
+                  activeVisit: this.activeVisit
+                }
+              });
+            }
           }
-        }
-      ]
-    });
+        ]
+      });
 
-    await alert.present();
-  },
-  (error: any) => {
-    console.error("Error during enrollment process:", error);
-  }
-);
-  }
+      await alert.present();
+    },
+    (error: any) => {
+      console.error("Error during enrollment process:", error);
+    }
+  );
+}
 }

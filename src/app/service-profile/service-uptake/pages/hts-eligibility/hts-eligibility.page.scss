@@ -1,0 +1,54 @@
+.header-container {
+  text-align: center;
+  margin-bottom: 8px; /* Reduced margin */
+}
+
+.form-title {
+  font-size: 1.5rem; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced gap between cards */
+}
+
+.small-card {
+  border: 1px solid #dcdcdc; /* Light grey border */
+  border-radius: 10px; /* Slightly smaller border-radius */
+  padding: 10px; /* Reduced padding */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03); /* Soft shadow for depth */
+}
+
+.card-title {
+  font-size: 16px; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e; /* Your preferred color */
+  margin-bottom: 6px; /* Reduced margin */
+}
+.cards-title {
+  font-size: 12px; /* Smaller font size */
+  font-weight: 600;
+  color: #1d434e; /* Your preferred color */
+  margin-bottom: 6px; /* Reduced margin */
+}
+
+.card-content {
+  font-size: 12px; /* Smaller font size */
+}
+
+.intervention-date {
+  margin-bottom: 10px; /* Reduced margin */
+  color: #444;
+}
+
+ion-button.edit-btn {
+  --border-radius: 6px; /* Smaller border-radius */
+  --padding-start: 12px; /* Reduced padding */
+  --padding-end: 12px; /* Reduced padding */
+  font-weight: 500;
+  font-size: 12px; /* Smaller font size */
+}

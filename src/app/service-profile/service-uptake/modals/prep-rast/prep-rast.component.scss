@@ -22,148 +22,137 @@
   }
 }
 
-ion-toolbar {
-  --background: var(--ion-color-primary);
-  --color: white;
-  border-radius: 15px 15px 0 0;
+/* Dimmed backdrop */
+.popup-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.4);
 }
 
-ion-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-ion-buttons {
-  padding-right: 10px;
-}
-
-ion-button {
-  --color: white;
-}
-
-/* Modal Content */
-ion-content {
-  --background: #f9f9f9;
-  padding: 15px;
-}
-
-/* Card Styling */
-ion-card {
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-ion-card-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--ion-color-primary);
-}
-
-ion-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Form Styling */
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.question-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-/* Input Fields */
-.form-control {
-  width: 100%;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  outline: none;
-}
-
-select.form-control {
-  background: white;
-}
-
-textarea.form-control {
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Submit Button */
-.btn-primary {
-  background: var(--ion-color-primary);
+.header {
+  --background: #26247B;
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  width: 90%;
-  text-align: center;
-}
-
-.btn-primary:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-/* Ensure modal appears as a pop-up on smaller screens */
-@media screen and (max-width: 500px) {
-  ::ng-deep .popup-modal {
-    --width: 90%;
-    --max-width: 90%;
-    --height: 70vh;
-    --top: 10%;
+  ion-title {
+    font-weight: bold;
   }
 }
 
-/* Dimmed backdrop */
-.popup-modal::part(backdrop) {
-  background: rgba(0, 0, 0, 0.3);
+.toolbar {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
 }
 
-.square-radio-group {
+.content {
+  padding: 20px;
+  background: #f4f4f4;
+}
+
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.checkbox-group {
+  margin-top: 12px;
+}
+
+.checkbox-item {
   display: flex;
-  flex-direction: column;
+  align-items: center;
 }
 
-.square-radio-item {
-  --border-radius: 0 !important;
-  --inner-border-radius: 0 !important;
+.checkbox-label {
+  margin-left: 10px;
 }
 
-.square-radio {
-  --size: 20px;
-  --indicator-size: 20px;
+.input-field {
+  border-bottom: 2px solid #26247B;
 }
 
-.square-radio .radio-icon {
-  border-radius: 0 !important; /* Force square border */
+.submit-btn {
+  background: #26247B;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-top: 20px;
 }
 
-.square-radio .radio-inner {
-  border-radius: 0 !important; /* Force square inner circle */
+ion-title {
+  font-size: 0.8rem;
+  font-weight: bold;
 }
+
 ion-card {
-  margin: 10px; /* Add margin to create space between cards */
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+ion-card-title {
+  font-size: 1.1rem;
+  color: #26247B;
 }
 
 ion-card-content {
-  padding: 16px; /* Add padding to card content */
+  padding: 14px;
 }
+
+ion-button {
+  margin-top: 14px;
+  --border-radius: 10px;
+  --background: #26247B;
+  color: white;
+  font-weight: bold;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.left-button {
+  flex: 1;
+  max-width: 120px; /* Adjust width as needed */
+}
+
+.right-button {
+  flex: 1;
+  max-width: 120px;
+}
+
+.custom-input {
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  padding: 8px; /* Padding inside the input */
+  width: 100%; /* Full width */
+  box-shadow: none; /* Remove default shadow */
+  background: white; /* Background color */
+}
+
+.form-heading {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #26247B; /* Use your preferred color */
+}
+
+
+

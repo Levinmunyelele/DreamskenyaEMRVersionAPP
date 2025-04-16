@@ -48,23 +48,43 @@ export class VisitService {
   }
   
 
-  checkoutVisit(locationUuid: string, visitTypeUuid: string): Observable<any> {
-    const visitUuid = this.getVisitUuid();
-
-    if (!visitUuid) {
-      console.error('No visit UUID found!');
-      return throwError(() => new Error('No visit UUID found!'));
-    }
-
-    const checkoutPayload = {
-      location: locationUuid,
-      startDatetime: new Date().toISOString().split('.')[0] + ".000Z",
-      stopDatetime: new Date().toISOString().split('.')[0] + ".000Z",
-      visitType: visitTypeUuid
-    };
-
-    return this.apiService.post(`visit/${visitUuid}`, checkoutPayload, false);
+checkoutVisit(
+  visitUuid: string,
+  locationUuid: string,
+  visitTypeUuid: string,
+  startDatetime: string
+): Observable<any> {
+  if (!visitUuid) {
+    console.error('No visit UUID found!');
+    return throwError(() => new Error('No visit UUID found!'));
   }
+
+  const checkoutPayload = {
+    location: locationUuid,
+    startDatetime: startDatetime, // ← Use provided visit start time
+    stopDatetime: new Date().toISOString().split('.')[0] + ".000Z", // ← Now
+    visitType: visitTypeUuid
+  };
+
+  return this.apiService.post(`visit/${visitUuid}`, checkoutPayload, false);
+}
+checkotVisit(locationUuid: string, visitTypeUuid: string): Observable<any> {
+  const visitUuid = this.getVisitUuid();
+
+  if (!visitUuid) {
+    console.error('No visit UUID found!');
+    return throwError(() => new Error('No visit UUID found!'));
+  }
+
+  const checkoutPayload = {
+    location: locationUuid,
+    startDatetime: new Date().toISOString().split('.')[0] + ".000Z",
+    stopDatetime: new Date().toISOString().split('.')[0] + ".000Z",
+    visitType: visitTypeUuid
+  };
+
+  return this.apiService.post(`visit/${visitUuid}`, checkoutPayload, false);
+}
 
   // Store the visit UUID in memory and localStorage
   private setVisitUuid(uuid: string): void {

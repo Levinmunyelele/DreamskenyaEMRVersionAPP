@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EncounterService } from '../services/encounter.service';
 import { AlertController } from '@ionic/angular';
 import { NavController } from '@ionic/angular'; 
@@ -253,29 +253,46 @@ export class RegistrationPage implements OnInit {
   
               const patientUuid = res.uuid;
               const patientName = res.display;
-  
-              const obs = [
-                {
-                  concept: "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
-                  value: { uuid: this.conceptMap['Marital Status'][formData['Marital Status']] }
-                },
-                {
-                  concept: "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
-                  value: { uuid: this.conceptMap['Education Level'][formData['Education Level']] }
-                },
-                {
-                  concept: "1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
-                  value: { uuid: this.conceptMap['Occupation'][formData['Occupation']] }
-                }
+
+              const allowedConcepts = [
+                "1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                "1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               ];
 
+               const obs = this.questions
+                    .map((question, index) => {
+                      if (!allowedConcepts.includes(question.concept)) return null; 
+                
+                      let value;
+                      if (question.type === "dropdown") {
+                        const control = this.registrationForm.get(question.concept) as FormArray;
+                        value = control?.value;
+                      } else {
+                        value = formData.responses[index] || null;
+                      }
+                
+                      return {
+                        concept: question.concept,
+                        value: Array.isArray(value) ? value.map((v: string) => ({ uuid: v })) : value,
+                      };
+                    })
+                    .filter(
+                      (obsItem) =>
+                        obsItem !== null &&
+                        obsItem.value !== null &&
+                        obsItem.value !== "" &&
+                        !(Array.isArray(obsItem.value) && obsItem.value.length === 0)
+                    );
+          
+  
               const encounterPayload = {
                 patient: patientUuid,
                 encounterType: "de1f9d67-b73e-4e1b-90d0-036166fc6995",
                 location: "c149692f-fb6f-4f5c-822c-144e52ef50f8",
                 encounterProviders: [
                   {
-                    provider: "75e10c41-5fbd-404a-95e4-54af210c0371", 
+                    provider: "75e10c41-5fbd-404a-95e4-54af210c0371",
                     encounterRole: "a0b03050-c99b-11e0-9572-0800200c9a66"
                   }
                 ],
@@ -310,7 +327,7 @@ export class RegistrationPage implements OnInit {
                   {
                     text: 'Go to Home',
                     handler: () => {
-                      this.navCtrl.navigateBack('/home');
+                      this.navCtrl.navigateBack('/homy');
                     }
                   }
                 ]

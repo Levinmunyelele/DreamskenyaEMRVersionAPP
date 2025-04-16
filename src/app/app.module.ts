@@ -20,6 +20,7 @@ import { BusinessFollowUpComponent } from './service-profile/service-uptake/moda
 import { AgywGraduationComponent} from './service-profile/service-uptake/modals/agyw-graduation/agyw-graduation.component';
 import { StiScreeningComponent } from './service-profile/service-uptake/modals/sti-screening/sti-screening.component';
 import { BusinessAssessmentComponent } from './service-profile/service-uptake/modals/business-assessment/business-assessment.component';
+import { HtsEligibilityComponent } from './service-profile/service-uptake/modals/hts-eligibility/hts-eligibility.component';
 
 
 
@@ -28,7 +29,7 @@ import { BusinessAssessmentComponent } from './service-profile/service-uptake/mo
   declarations: [AppComponent, AddRoleModalComponent,BehaviouralModalPage, 
     BiomedicalModalPage, PostViolenceModalPage, EnrollmentFormComponent,
     HomeVisitComponent,PrepRastComponent, BusinessFollowUpComponent, 
-    AgywGraduationComponent,StiScreeningComponent,BusinessAssessmentComponent ],
+    AgywGraduationComponent,StiScreeningComponent,BusinessAssessmentComponent,HtsEligibilityComponent ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),

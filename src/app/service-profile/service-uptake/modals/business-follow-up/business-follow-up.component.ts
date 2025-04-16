@@ -182,6 +182,9 @@ export class BusinessFollowUpComponent implements OnInit {
 
   totalSteps!: number;
   sections!: { questions: any[]; formGroup: FormGroup<any> }[];
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
   constructor(
     private modalCtrl: ModalController,
     private fb: FormBuilder,
@@ -229,6 +232,25 @@ export class BusinessFollowUpComponent implements OnInit {
     if (this.encounter) {
       this.populateForm();
     }
+    this.activeVisit = this.navParams.get('activeVisit');
+    this.encounterType = this.navParams.get('encounterType');
+    this.form = this.navParams.get('form');
+    this.patientData = this.navParams.get('patientData');
+    this.visitType = this.navParams.get('visitType');
+    this.location = this.navParams.get('location');
+    this.patientUuid = this.navParams.get('patientUuid');
+    this.encounter = this.navParams.get('encounter');
+
+    console.log("Modal Data Received:", {
+      activeVisit: this.activeVisit,
+      encounterType: this.encounterType,
+      form: this.form,
+      patientData: this.patientData,
+      visitType: this.visitType,
+      location: this.location,
+      patientUuid: this.patientUuid,
+      encounter: this.encounter
+    });
     
   }
 
@@ -343,54 +365,123 @@ export class BusinessFollowUpComponent implements OnInit {
         .map((question) => {
           let value = formGroup.value[question.concept];
   
-          if (value !== null && value !== undefined) {
-            if (typeof value === 'string' && value.trim() === '') {
-              return null; 
-            }
-            if (Array.isArray(value) && value.length === 0) {
-              return null;
-            }
-            if (typeof value === 'number' && isNaN(value)) {
-              return null; 
+          if (value !== null && value !== undefined && value !== '') {
+            if (['dropdown', 'radio', 'text', 'textarea', 'number', 'date'].includes(question.type)) {
+              return { concept: question.concept, value: value };
             }
   
-            return { concept: question.concept, value: value };
+            if (question.type === 'checkbox') {
+              const control = formGroup.get(question.concept) as FormArray;
+              value = control?.value || [];
+  
+              return value.map((v: string) => ({
+                concept: question.concept,
+                value: v
+              }));
+            }
+  
+            return { concept: question.concept, value };
           }
   
           return null;
         })
-        .filter(Boolean); 
+        .filter(Boolean)
+        .reduce((acc, curr) => acc.concat(curr), []);
     };
   
-    const obs = [
+    const allObs = [
       ...extractObs(this.questions, this.followForm),
       ...extractObs(this.secondSection, this.secondFormGroup),
       ...extractObs(this.thirdSection, this.thirdFormGroup),
-      ...extractObs(this.forthSection, this.forthFormGroup),
+      ...extractObs(this.forthSection, this.forthFormGroup)
     ];
   
+    const patientUuid = this.patientData.uuid;
+    const visitUuid = this.activeVisit?.uuid || null;
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+    const encounterUuid = this.encounter?.uuid || null;  // Check if encounterUuid exists
+  
+    if (!locationUuid) {
+      console.error('Location UUID is missing. Cannot proceed.');
+      return;
+    }
+  
     const payload = {
-      patient: this.patientData.uuid,
-      visit: this.visitType || null,
+      patient: patientUuid,
+      visit: visitUuid,
       encounterType: this.encounterType,
-      form: this.form,
-      obs: obs,
+      form: this.form || 'default-form-uuid',
+      obs: allObs,
       orders: [],
       diagnoses: [],
-      location: this.patientData.identifiers?.[0]?.location?.uuid || null,
+      location: locationUuid,
     };
   
     console.log('Payload to be sent:', payload);
   
-    this.encounterService.submitEncounter(payload).subscribe(
-      (response) => {
-        console.log('API Response:', response);
-        this.modalCtrl.dismiss({ refresh: true, data: response });
-      },
-      (error) => {
-        console.error('API Error:', error);
-        this.modalCtrl.dismiss({ refresh: false, error: error });
-      }
-    );
+    if (encounterUuid) {
+      // If encounterUuid exists, update the existing encounter
+      this.encounterService.getEncounterByUuid(encounterUuid).subscribe(
+        (existingEncounter) => {
+          if (!existingEncounter) {
+            console.error('Encounter to update not found:', encounterUuid);
+            this.modalCtrl.dismiss({ refresh: false, error: 'Encounter not found' });
+            return;
+          }
+  
+          const existingObs = existingEncounter.obs || [];
+          const updatedObs = allObs.map((obsItem) => {
+            const existingIndex = existingObs.findIndex(
+              (o: { concept: { uuid: string } }) => o.concept.uuid === obsItem.concept
+            );
+            if (existingIndex > -1) {
+              return {
+                uuid: existingObs[existingIndex].uuid,
+                concept: obsItem.concept,
+                value: obsItem.value,
+              };
+            } else {
+              return obsItem;
+            }
+          });
+  
+          const finalPayload = {
+            ...payload,
+            obs: updatedObs,
+          };
+  
+          console.log('Updating encounter:', encounterUuid, finalPayload);
+  
+          this.encounterService.updateEncounter(encounterUuid, finalPayload).subscribe(
+            (response) => {
+              console.log('Encounter updated successfully:', response);
+              this.modalCtrl.dismiss({ refresh: true, data: response });
+            },
+            (error) => {
+              console.error('Error updating encounter:', error);
+              this.modalCtrl.dismiss({ refresh: false, error });
+            }
+          );
+        },
+        (error) => {
+          console.error('Error fetching existing encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    } else {
+      // If encounterUuid doesn't exist, create a new encounter
+      this.encounterService.submitEncounter(payload).subscribe(
+        (response) => {
+          console.log('New encounter created successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('Error submitting encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    }
   }
+  
+  
 }

@@ -22,6 +22,7 @@ export class BioMedicalPage implements OnInit {
   form: string = "";
   encounters: any[] = [];
   interventionDisplay = 'DREAMS Bio Medical Interventions';
+  activeVisit: any;
 
 
   constructor(private navCtrl: NavController,
@@ -35,116 +36,99 @@ export class BioMedicalPage implements OnInit {
     this.navCtrl.back();
   }
 
-   async openModal(encounter?: any) {
-      const modal = await this.modalCtrl.create({
-        component: BiomedicalModalPage,
-        cssClass: 'popup-modal',
-        backdropDismiss: true,
-        componentProps: {
-          patientData: this.patientData,
-          enrollmentData: this.enrollmentData,
-          encounterData: this.encounterData,
-          visitType: this.visitType,
-          encounterType: this.encounterType,
-          form: this.form,
-          encounter: encounter
-        }
-      });
-    
-      modal.onDidDismiss().then((result) => {
-        if (result.data) {
-          console.log('Response from modal:', result.data);
-          if (result.data.refresh) {
-            this.fetchEncounters();
-          } else {
-            this.updateEncounterDetails(result.data); 
-          }
-        }
-      });
-    
-      await modal.present();
-    }
-    
-    updateEncounterDetails(response: any) {
-      this.encounterData = response;
-    }
-    
-    getIntervention(obs: any[]): string {
-      const intervention = obs.find(o => o.display.includes(this.interventionDisplay));
-      if (intervention) {
-        const parts = intervention.display.split(':');
-        if (parts.length > 1) {
-          return parts.slice(1).join(':').trim();
-        } else {
-          return 'No intervention details found';
-        }
-      } else {
-        return `No ${this.interventionDisplay}`;
-      }
-    }
-    
-    getInterventionDate(obs: any[]): string {
-      const interventionDate = obs.find(o => o.display.includes('DREAMS Intervention Date'));
-      return interventionDate ? interventionDate.obsDatetime : 'No Date Available';
-    }
-    
-    fetchEncounters() {
-      if (!this.patientData?.uuid || !this.encounterType) {
-        console.warn("Missing patient UUID or encounter type");
-        return;
-      }
-    
-      this.encounterService.getEncounters(this.patientData.uuid, this.encounterType).subscribe(
-        (encounters) => {
-          if (encounters.length > 0) {
-            this.encounters = encounters.filter(encounter => {
-              return encounter.obs && encounter.obs.some((obs: { display: string | string[]; }) => obs.display.includes(this.interventionDisplay));
-            });
-    
-            console.log("Fetched and Filtered Encounters:", this.encounters);
-          } else {
-            this.encounters = [];
-            console.log("No encounters found for this patient.");
-          }
-        },
-        (error) => {
-          console.error("Error fetching encounters:", error);
-        }
-      );
-    }
-
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      if (params['data']) {
-        this.patientData = JSON.parse(params['data']);
-      }
-      if (params['enrollmentData']) {
-        this.enrollmentData = JSON.parse(params['enrollmentData']);
-      }
-      if (params['encounterData']) {
-        this.encounterData = JSON.parse(params['encounterData']);
-      }
-      if (params['visit']) {
-        this.visitType = params['visit'];
-      }
-      if (params['encounterType']) {
-        this.encounterType = params['encounterType'];
-      }
-      if (params['form']) {
-        this.form = params['form'];
-      }
-      console.log("Received Data in Behavioural Page:", {
+  async openModal(encounter?: any) {
+    const modal = await this.modalCtrl.create({
+      component: BiomedicalModalPage,
+      cssClass: 'popup-modal',
+      backdropDismiss: true,
+      componentProps: {
         patientData: this.patientData,
-        enrollmentData: this.enrollmentData,
-        encounterData: this.encounterData,
-        visitType: this.visitType,
+        activeVisit: this.activeVisit,
+        encounter: encounter,
         encounterType: this.encounterType,
-        form: this.form
-      });
+        form: this.form,
+        visitType: this.activeVisit?.visitType,
+        location: this.activeVisit?.location,
+        patientUuid: this.patientData?.uuid || this.activeVisit?.patient?.uuid
+      }
     });
 
-    this.fetchEncounters();
-    
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        console.log('Response from modal:', result.data);
+        if (result.data.refresh) {
+          this.fetchEncounters();
+        } else {
+          this.updateEncounterDetails(result.data);
+        }
+      }
+    });
 
+    await modal.present();
   }
+
+  updateEncounterDetails(response: any) {
+    this.encounterData = response;
+  }
+
+  getIntervention(obs: any[]): string {
+    const intervention = obs.find(o => o.display.includes(this.interventionDisplay));
+    if (intervention) {
+      const parts = intervention.display.split(':');
+      if (parts.length > 1) {
+        return parts.slice(1).join(':').trim();
+      } else {
+        return 'No intervention details found';
+      }
+    } else {
+      return `No ${this.interventionDisplay}`;
+    }
+  }
+
+  getInterventionDate(obs: any[]): string {
+    const interventionDate = obs.find(o => o.display.includes('DREAMS Intervention Date'));
+    return interventionDate ? interventionDate.obsDatetime : 'No Date Available';
+  }
+
+  fetchEncounters() {
+    if (!this.patientData?.uuid || !this.encounterType) {
+      console.warn("Missing patient UUID or encounter type");
+      return;
+    }
+
+    this.encounterService.getEncounters(this.patientData.uuid, this.encounterType).subscribe(
+      (encounters) => {
+        if (encounters.length > 0) {
+          this.encounters = encounters.filter(encounter => {
+            return encounter.obs && encounter.obs.some((obs: { display: string | string[]; }) => obs.display.includes(this.interventionDisplay));
+          });
+
+          console.log("Fetched and Filtered Encounters:", this.encounters);
+        } else {
+          this.encounters = [];
+          console.log("No encounters found for this patient.");
+        }
+      },
+      (error) => {
+        console.error("Error fetching encounters:", error);
+      }
+    );
+  }
+
+  ngOnInit() {
+    const navState = window.history.state;
+    this.activeVisit = navState.activeVisit;
+    this.encounterType = navState.encounterType;
+    this.form = navState.form
+    this.patientData = navState.patientData,
+
+
+    console.log("Active Visit:", this.activeVisit);
+    console.log("Patient UUID from Active Visit:", this.activeVisit?.patient?.uuid);
+    console.log("Encounter Type:", this.encounterType);
+    console.log('patient data', this.patientData)
+
+    this.fetchEncounters();
+  }
+
 }

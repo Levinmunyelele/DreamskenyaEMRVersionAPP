@@ -286,6 +286,9 @@ export class BusinessAssessmentComponent implements OnInit {
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
   radioedradioes: { [key: string]: string[] } = {}
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
 
   constructor(
     private modalCtrl: ModalController,
@@ -306,41 +309,42 @@ export class BusinessAssessmentComponent implements OnInit {
   ngOnInit() {
     this.assForm = this.fb.group({});
     this.secondFormGroup = this.fb.group({});
-
-
+  
     this.sections = [
       { questions: this.questions, formGroup: this.assForm },
       { questions: this.secondSection, formGroup: this.secondFormGroup },
-
-
     ];
     this.totalSteps = this.sections.length;
-
+  
     this.sections.forEach(({ questions, formGroup }) => {
       questions.forEach((question) => {
         if (question.type === "radio") {
-          formGroup.addControl(question.concept, this.fb.control([]));
+          formGroup.addControl(question.concept, this.fb.control(null)); // Or this.fb.control('')
         } else {
           formGroup.addControl(question.concept, this.fb.control(""));
         }
       });
     });
-    this.patientData = this.navParams.get('patientData');
-    this.enrollmentData = this.navParams.get('enrollmentData');
-    this.encounterData = this.navParams.get('encounterData');
-    this.visitType = this.navParams.get('visitType');
+    this.activeVisit = this.navParams.get('activeVisit');
     this.encounterType = this.navParams.get('encounterType');
     this.form = this.navParams.get('form');
-
+    this.patientData = this.navParams.get('patientData');
+    this.visitType = this.navParams.get('visitType');
+    this.location = this.navParams.get('location');
+    this.patientUuid = this.navParams.get('patientUuid');
+    this.encounter = this.navParams.get('encounter');
+  
     console.log("Modal Data Received:", {
-      patientData: this.patientData,
-      enrollmentData: this.enrollmentData,
-      encounterData: this.encounterData,
-      visitType: this.visitType,
+      activeVisit: this.activeVisit,
       encounterType: this.encounterType,
-      form: this.form
+      form: this.form,
+      patientData: this.patientData,
+      visitType: this.visitType,
+      location: this.location,
+      patientUuid: this.patientUuid,
+      encounter: this.encounter
     });
-
+  
     if (this.encounter) {
       this.populateForm();
     }
@@ -420,77 +424,145 @@ export class BusinessAssessmentComponent implements OnInit {
       console.error('Patient data is missing');
       return;
     }
-
+  
     if (!this.questions || !this.secondSection) {
       console.warn('One or more question sections are missing, skipping form submission.');
       return;
     }
-
+  
     if (!this.assForm || !this.secondFormGroup) {
       console.error('One or more form groups are missing.');
       return;
     }
-
-
+  
     const extractObs = (questions: any[], formGroup: any) => {
       return questions
         .map((question) => {
           let value = formGroup.value[question.concept];
-
+  
           if (value !== null && value !== undefined && value !== '') {
-            if (['dropdown', 'radio'].includes(question.type)) {
+            if (['dropdown', 'radio', 'text', 'textarea', 'number', 'date'].includes(question.type)) {
               return { concept: question.concept, value: value };
             }
-            if (['text', 'textarea'].includes(question.type)) {
-              return { concept: question.concept, value: value };
+  
+            if (question.type === 'checkbox') {
+              const control = formGroup.get(question.concept) as FormArray;
+              value = control?.value || [];
+  
+              return value.map((v: string) => ({
+                concept: question.concept,
+                value: v
+              }));
             }
-
-            if (question.type === 'number') {
-              return { concept: question.concept, value: value };
-            }
-
-            if (question.type === 'date') {
-              return { concept: question.concept, value: value };
-            }
-
+  
             return { concept: question.concept, value };
           }
-
+  
           return null;
         })
         .filter(Boolean)
+        .reduce((acc, curr) => acc.concat(curr), []);
     };
-
-
-
-    const obs = [
+  
+    const allObs = [
       ...extractObs(this.questions, this.assForm),
       ...extractObs(this.secondSection, this.secondFormGroup),
-
     ];
-
-    const payload = {
-      patient: this.patientData.uuid,
-      visit: this.visitType || null,
-      encounterType: this.encounterType,
+  
+    const patientUuid = this.patientData.uuid;
+    const visitUuid = this.activeVisit?.uuid || null;
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+    const encounterUuid = this.encounter?.uuid || null;
+    const encounterTypeUuid = this.encounterType;
+  
+    if (!locationUuid) {
+      console.error('Location UUID is missing. Cannot proceed.');
+      return;
+    }
+  
+    const payloadBase = {
+      patient: patientUuid,
+      visit: visitUuid,
+      encounterType: encounterTypeUuid,
       form: this.form,
-      obs: obs,
       orders: [],
       diagnoses: [],
-      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+      location: locationUuid,
     };
-
-    console.log('Payload to be sent:', payload);
-
-    this.encounterService.submitEncounter(payload).subscribe(
-      (response) => {
-        console.log('API Response:', response);
-        this.modalCtrl.dismiss({ refresh: true, data: response });
-      },
-      (error) => {
-        console.error('API Error:', error);
-        this.modalCtrl.dismiss({ refresh: false, error: error });
-      }
-    );
+  
+    if (encounterUuid) {
+      // Updating existing encounter
+      this.encounterService.getEncounterByUuid(encounterUuid).subscribe(
+        (existingEncounter) => {
+          if (!existingEncounter) {
+            console.error('Encounter to update not found:', encounterUuid);
+            this.modalCtrl.dismiss({ refresh: false, error: 'Encounter not found' });
+            return;
+          }
+  
+          const existingObs = existingEncounter.obs || [];
+  
+          const updatedObs = allObs.map((newObs) => {
+            if (!newObs) return null;
+  
+            const matchIndex = existingObs.findIndex(
+              (eo: any) => eo?.concept?.uuid === newObs.concept
+            );
+  
+            if (matchIndex > -1) {
+              return {
+                uuid: existingObs[matchIndex].uuid,
+                concept: newObs.concept,
+                value: newObs.value
+              };
+            }
+  
+            return newObs;
+          }).filter(Boolean);
+  
+          const finalPayload = {
+            ...payloadBase,
+            obs: updatedObs,
+          };
+  
+          console.log('Updating encounter:', encounterUuid, finalPayload);
+  
+          this.encounterService.updateEncounter(encounterUuid, finalPayload).subscribe(
+            (response) => {
+              console.log('Encounter updated successfully:', response);
+              this.modalCtrl.dismiss({ refresh: true, data: response });
+            },
+            (error) => {
+              console.error('Error updating encounter:', error);
+              this.modalCtrl.dismiss({ refresh: false, error });
+            }
+          );
+        },
+        (error) => {
+          console.error('Error fetching existing encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    } else {
+      // Creating new encounter
+      const newPayload = {
+        ...payloadBase,
+        obs: allObs,
+      };
+  
+      console.log('Creating new encounter with payload:', newPayload);
+  
+      this.encounterService.submitEncounter(newPayload).subscribe(
+        (response) => {
+          console.log('New encounter created successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('Error creating encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    }
   }
+  
 }  

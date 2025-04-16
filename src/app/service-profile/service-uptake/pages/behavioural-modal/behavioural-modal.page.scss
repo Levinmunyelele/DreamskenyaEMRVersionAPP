@@ -1,137 +1,138 @@
 ::ng-deep .popup-modal {
-    --width: 80%;
-    --max-width: 500px;
-    --height: auto;
-    --border-radius: 8px;
-    --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    --background: white;
-    --top: 15%;
-    padding-bottom: 20px;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  --width: 80%;
+  --max-width: 500px;
+  --height: auto;
+  --border-radius: 15px;
+  --box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  --background: white;
+  --top: 15%;
+  padding-bottom: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Header */
+ion-header {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  overflow: hidden;
+}
+
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  --color: white;
+  border-radius: 15px 15px 0 0;
+}
+
+ion-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+ion-buttons {
+  padding-right: 10px;
+}
+
+ion-button {
+  --color: white;
+}
+
+/* Modal Content */
+ion-content {
+  --background: #f9f9f9;
+  padding: 15px;
+}
+
+/* Card Styling */
+ion-card {
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+ion-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+}
+
+ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Input Fields */
+.form-control {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+}
+
+select.form-control {
+  background: white;
+}
+
+textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Submit Button */
+.btn-primary {
+  background: var(--ion-color-primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: 90%;
+  text-align: center;
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Ensure modal appears as a pop-up on smaller screens */
+@media screen and (max-width: 500px) {
+  ::ng-deep .popup-modal {
+    --width: 90%;
+    --max-width: 90%;
+    --height: 70vh;
+    --top: 10%;
   }
-  
-  ion-header {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    overflow: hidden;
-  }
-  
-  ion-toolbar {
-    --background: var(--ion-color-primary);
-    --color: white;
-    border-radius: 15px 15px 0 0;
-  }
-  
-  ion-title {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  ion-buttons {
-    padding-right: 10px;
-  }
-  
-  ion-button {
-    --color: white;
-  }
-  
-  ion-content {
-    --background: #f9f9f9;
-    padding: 15px;
-  }
-  
-  /* Card Styling */
-  ion-card {
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  ion-card-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: var(--ion-color-primary);
-  }
-  
-  ion-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  /* Form Styling */
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .question-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  
-  label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-  }
-  
-  /* Input Fields */
-  .form-control {
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    outline: none;
-  }
-  
-  select.form-control {
-    background: white;
-  }
-  
-  textarea.form-control {
-    min-height: 80px;
-    resize: vertical;
-  }
-  
-  /* Submit Button */
-  .btn-primary {
-    background: var(--ion-color-primary);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    width: 90%;
-    text-align: center;
-  }
-  
-  .btn-primary:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-  
-  /* Ensure modal appears as a pop-up on smaller screens */
-  @media screen and (max-width: 500px) {
-    ::ng-deep .popup-modal {
-      --width: 105%;
-      --max-width: 200%;
-      --height: 100vh;
-      --top: 10%;
-    }
-  }
-  
-  /* Dimmed backdrop */
-  .popup-modal::part(backdrop) {
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
+}
+
+/* Dimmed backdrop */
+.popup-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.3);
+}

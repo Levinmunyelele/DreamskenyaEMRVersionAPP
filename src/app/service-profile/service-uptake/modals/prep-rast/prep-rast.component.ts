@@ -115,6 +115,9 @@ export class PrepRastComponent  implements OnInit {
   }
 ];
   sections: any[] | undefined;
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
 
 constructor(
   private modalCtrl: ModalController,
@@ -178,12 +181,12 @@ extractValue(display: string): string {
 }
 submitForm() {
   if (!this.patientData) {
-    console.error('Patient data is missing');
+    console.error('Patient data is missing.');
     return;
   }
 
   if (!this.questions || this.questions.length === 0) {
-    console.warn('No questions available, skipping form submission.');
+    console.warn('No questions available. Skipping form submission.');
     return;
   }
 
@@ -192,18 +195,38 @@ submitForm() {
     return;
   }
 
-  const obs = this.questions.map((question, index) => {
-    const value = this.responses.at(index)?.value;
-    return {
-      concept: question.concept,
-      value: question.type === 'dropdown' ? { uuid: value } : value
-    };
-  });
+  const extractObs = (questions: any[], responses: any) => {
+    return questions
+      .map((question, index) => {
+        const value = responses.at(index)?.value;
+
+        if (value !== null && value !== undefined) {
+          if (typeof value === 'string' && value.trim() === '') return null;
+          if (Array.isArray(value) && value.length === 0) return null;
+          if (typeof value === 'number' && isNaN(value)) return null;
+
+          let obsValue = value;
+          if (['dropdown', 'radio'].includes(question.type)) {
+            obsValue = { uuid: value };
+          }
+
+          return {
+            concept: question.concept,
+            value: obsValue
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  const obs = extractObs(this.questions, this.responses);
 
   const patientUuid = this.patientData.uuid;
   const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
-  const visitUuid = this.visitType || null;
-  const encounterTypeUuid = this.encounterType || "6e5ec039-8d2a-4172-b3fb-ee9d0ba647b7";
+  const visitUuid = this.activeVisit?.uuid || null;
+  const encounterTypeUuid = this.encounterType || '6e5ec039-8d2a-4172-b3fb-ee9d0ba647b7';
 
   if (!locationUuid) {
     console.error('Location UUID is missing from patient data.');
@@ -211,18 +234,18 @@ submitForm() {
   }
 
   if (!visitUuid) {
-    console.warn('Visit UUID is missing. Setting visit to null.');
+    console.warn('Visit UUID is missing. Proceeding without visit.');
   }
 
   if (!this.encounterType) {
-    console.warn('Encounter Type is missing. Using default.');
+    console.warn('Encounter type is missing. Using default.');
   }
 
   const payload = {
     patient: patientUuid,
     visit: visitUuid,
     encounterType: encounterTypeUuid,
-    form: this.form || "68f03464-e4cf-4336-b264-e3d43f1f123c",
+    form: this.form || 'default-form-uuid',
     obs: obs,
     orders: [],
     diagnoses: [],
@@ -231,36 +254,54 @@ submitForm() {
 
   console.log('Payload to be sent:', payload);
 
-  this.encounterService.submitEncounter(payload).subscribe(
-    (response) => {
-      console.log('API Response:', response);
-      this.modalCtrl.dismiss({ refresh: true, data: response });
-    },
-    (error) => {
-      console.error('API Error:', error);
-      this.modalCtrl.dismiss({ refresh: false, error: error });
-    }
-  );
+  // Check if encounter exists, and either update or submit encounter
+  if (this.encounter && this.encounter.uuid) {
+    // Update encounter
+    this.encounterService.updateEncounter(this.encounter.uuid, payload).subscribe(
+      (response) => {
+        console.log('Encounter updated successfully:', response);
+        this.modalCtrl.dismiss({ refresh: true, data: response });
+      },
+      (error) => {
+        console.error('Error updating encounter:', error);
+        this.modalCtrl.dismiss({ refresh: false, error });
+      }
+    );
+  } else {
+    // Submit new encounter
+    this.encounterService.submitEncounter(payload).subscribe(
+      (response) => {
+        console.log('API Response:', response);
+        this.modalCtrl.dismiss({ refresh: true, data: response });
+      },
+      (error) => {
+        console.error('API Error:', error);
+        this.modalCtrl.dismiss({ refresh: false, error });
+      }
+    );
+  }
 }
 
-
 ngOnInit() {
-  this.patientData = this.navParams.get('patientData');
-  this.enrollmentData = this.navParams.get('enrollmentData');
-  this.encounterData = this.navParams.get('encounterData');
-  this.visitType = this.navParams.get('visitType');
+  this.activeVisit = this.navParams.get('activeVisit');
   this.encounterType = this.navParams.get('encounterType');
   this.form = this.navParams.get('form');
+  this.patientData = this.navParams.get('patientData');
+  this.visitType = this.navParams.get('visitType');
+  this.location = this.navParams.get('location');
+  this.patientUuid = this.navParams.get('patientUuid');
+  this.encounter = this.navParams.get('encounter');
 
   console.log("Modal Data Received:", {
-    patientData: this.patientData,
-    enrollmentData: this.enrollmentData,
-    encounterData: this.encounterData,
-    visitType: this.visitType,
+    activeVisit: this.activeVisit,
     encounterType: this.encounterType,
-    form: this.form
+    form: this.form,
+    patientData: this.patientData,
+    visitType: this.visitType,
+    location: this.location,
+    patientUuid: this.patientUuid,
+    encounter: this.encounter
   });
-
   this.prepForm = this.fb.group({
     responses: this.fb.array(this.questions?.map(() => this.fb.control('')) || [])
   });

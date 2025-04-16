@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, NavParams } from '@ionic/angular';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EncounterService } from 'src/app/services/encounter.service';
 
@@ -315,6 +315,9 @@ export class AgywGraduationComponent implements OnInit {
 
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
 
   constructor(
     private modalCtrl: ModalController,
@@ -362,20 +365,24 @@ export class AgywGraduationComponent implements OnInit {
       });
 
     });
-    this.patientData = this.navParams.get('patientData');
-    this.enrollmentData = this.navParams.get('enrollmentData');
-    this.encounterData = this.navParams.get('encounterData');
-    this.visitType = this.navParams.get('visitType');
+    this.activeVisit = this.navParams.get('activeVisit');
     this.encounterType = this.navParams.get('encounterType');
     this.form = this.navParams.get('form');
-    console.log('Modal Data Received:', {
-      patientData: this.patientData,
-      enrollmentData: this.enrollmentData,
-      encounterData: this.encounterData,
-      visitType: this.visitType,
+    this.patientData = this.navParams.get('patientData');
+    this.visitType = this.navParams.get('visitType');
+    this.location = this.navParams.get('location');
+    this.patientUuid = this.navParams.get('patientUuid');
+    this.encounter = this.navParams.get('encounter');
+
+    console.log("Modal Data Received:", {
+      activeVisit: this.activeVisit,
       encounterType: this.encounterType,
       form: this.form,
-
+      patientData: this.patientData,
+      visitType: this.visitType,
+      location: this.location,
+      patientUuid: this.patientUuid,
+      encounter: this.encounter
     });
 
     if (this.encounter) {
@@ -453,51 +460,40 @@ export class AgywGraduationComponent implements OnInit {
   
     const obs = this.encounter.obs;
   
-    obs.forEach((ob: any) => {
-      const conceptUuid = ob.concept.uuid;
-      const value = this.extractValue(ob.display);
+    this.sections.forEach((section) => {
+      section.questions?.forEach((question) => {
+        const conceptUuid = question.concept;
+        const control = section.formGroup.get(conceptUuid);
   
-      let question: any = this.questions.find((q) => q.concept === conceptUuid);
-      let formGroup = this.gradForm;
-  
-      if (!question) {
-        question = this.secondSection.find((q) => q.concept === conceptUuid);
-        formGroup = this.secondFormGroup;
-      }
-  
-      if (!question) {
-        question = this.thirdSection.find((q) => q.concept === conceptUuid);
-        formGroup = this.thirdFormGroup;
-      }
-  
-      if (question && formGroup) {
-        const control = formGroup.get(question.concept);
-        if (control) {
-          if (question.type === 'radio' && question.options) {
-            const option = question.options.find((opt: any) => opt.label === value);
-            if (option) {
-              control.setValue(option.value);
+        if (question.type === 'checkbox' && question.options && control instanceof FormArray) {
+          control.clear();
+          obs.forEach((ob: any) => {
+            if (ob.concept.uuid === conceptUuid) {
+              const extractedValue = this.extractValue(ob.display);
+              question.options.forEach((option: any) => {
+                if (extractedValue === option.label) {
+                  control.push(this.fb.control(option.value));
+                }
+              });
             }
-          } else if (question.type === 'checkbox' && question.options) {
-            try {
-              const savedValues = JSON.parse(value);
-              if (Array.isArray(savedValues)) {
-                control.setValue(savedValues);
-              } else {
-                console.warn(`Saved value for ${question.concept} is not an array: ${value}`);
+          });
+        } else if (control instanceof FormControl) {
+          const matchingObs = obs.find((ob: { concept: { uuid: string; }; }) => ob.concept.uuid === conceptUuid);
+          if (matchingObs) {
+            const extractedValue = this.extractValue(matchingObs.display);
+            if (question.type === 'radio' && question.options) {
+              const option = question.options.find((opt: any) => opt.label === extractedValue);
+              if (option) {
+                control.setValue(option.value);
               }
-            } catch (e) {
-              console.warn(`Saved value for ${question.concept} is not valid JSON: ${value}`);
-              control.setValue([]);
+            } else if (question.type === 'date' || question.type === 'text') {
+              control.setValue(extractedValue);
             }
-          } else if (question.type === 'date' || question.type === 'text') {
-            control.setValue(value);
           }
         }
-      }
+      });
     });
   }
-  
   extractValue(display: string): string {
     const parts = display.split('::');
     if (parts.length > 1) {
@@ -513,23 +509,22 @@ export class AgywGraduationComponent implements OnInit {
       console.error('Patient data is missing');
       return;
     }
-
+  
     if (!this.questions || !this.secondSection || !this.thirdSection) {
       console.warn('One or more question sections are missing, skipping form submission.');
       return;
     }
-
+  
     if (!this.gradForm || !this.secondFormGroup || !this.thirdFormGroup) {
       console.error('One or more form groups are missing.');
       return;
     }
-
-
+  
     const extractObs = (questions: any[], formGroup: any) => {
       return questions
         .map((question) => {
           let value = formGroup.value[question.concept];
-
+  
           if (value !== null && value !== undefined && value !== '') {
             if (['dropdown', 'radio'].includes(question.type)) {
               return { concept: question.concept, value: value };
@@ -537,65 +532,124 @@ export class AgywGraduationComponent implements OnInit {
             if (['text', 'textarea'].includes(question.type)) {
               return { concept: question.concept, value: value };
             }
-
-
+  
             if (question.type === 'number') {
               return { concept: question.concept, value: value };
             }
-
+  
             if (question.type === 'date') {
               return { concept: question.concept, value: value };
             }
-
+  
             if (question.type === 'checkbox') {
               const control = formGroup.get(question.concept) as FormArray;
               value = control?.value || [];
-
+  
               return value.map((v: string) => ({
                 concept: question.concept,
                 value: v
               }));
             }
-
+  
             return { concept: question.concept, value };
           }
-
+  
           return null;
         })
         .filter(Boolean)
         .reduce((acc, curr) => acc.concat(curr), []);
     };
-
-
-
+  
     const obs = [
       ...extractObs(this.questions, this.gradForm),
       ...extractObs(this.secondSection, this.secondFormGroup),
       ...extractObs(this.thirdSection, this.thirdFormGroup),
     ];
-
+  
+    const visitUuid = this.activeVisit?.uuid || null;
+    const encounterUuid = this.encounter?.uuid || null; // Check if encounterUuid exists
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+  
+    if (!locationUuid) {
+      console.error('Location UUID is missing. Cannot proceed.');
+      return;
+    }
+  
     const payload = {
       patient: this.patientData.uuid,
-      visit: this.visitType || null,
+      visit: visitUuid,
       encounterType: this.encounterType,
       form: this.form,
       obs: obs,
       orders: [],
       diagnoses: [],
-      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+      location: locationUuid,
     };
-
+  
     console.log('Payload to be sent:', payload);
-
-    this.encounterService.submitEncounter(payload).subscribe(
-      (response) => {
-        console.log('API Response:', response);
-        this.modalCtrl.dismiss({ refresh: true, data: response });
-      },
-      (error) => {
-        console.error('API Error:', error);
-        this.modalCtrl.dismiss({ refresh: false, error: error });
-      }
-    );
+  
+    if (encounterUuid) {
+      // If encounterUuid exists, update the existing encounter
+      this.encounterService.getEncounterByUuid(encounterUuid).subscribe(
+        (existingEncounter) => {
+          if (!existingEncounter) {
+            console.error('Encounter to update not found:', encounterUuid);
+            this.modalCtrl.dismiss({ refresh: false, error: 'Encounter not found' });
+            return;
+          }
+  
+          const existingObs = existingEncounter.obs || [];
+          const updatedObs = obs.map((obsItem) => {
+            const existingIndex = existingObs.findIndex(
+              (o: { concept: { uuid: string } }) => o.concept.uuid === obsItem.concept
+            );
+            if (existingIndex > -1) {
+              return {
+                uuid: existingObs[existingIndex].uuid,
+                concept: obsItem.concept,
+                value: obsItem.value,
+              };
+            } else {
+              return obsItem;
+            }
+          });
+  
+          const finalPayload = {
+            ...payload,
+            obs: updatedObs,
+          };
+  
+          console.log('Updating encounter:', encounterUuid, finalPayload);
+  
+          this.encounterService.updateEncounter(encounterUuid, finalPayload).subscribe(
+            (response) => {
+              console.log('Encounter updated successfully:', response);
+              this.modalCtrl.dismiss({ refresh: true, data: response });
+            },
+            (error) => {
+              console.error('Error updating encounter:', error);
+              this.modalCtrl.dismiss({ refresh: false, error });
+            }
+          );
+        },
+        (error) => {
+          console.error('Error fetching existing encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    } else {
+      // If encounterUuid doesn't exist, create a new encounter
+      this.encounterService.submitEncounter(payload).subscribe(
+        (response) => {
+          console.log('New encounter created successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('API Error:', error);
+          this.modalCtrl.dismiss({ refresh: false, error: error });
+        }
+      );
+    }
   }
+  
 }  

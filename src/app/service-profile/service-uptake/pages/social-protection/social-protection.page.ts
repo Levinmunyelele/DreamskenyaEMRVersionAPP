@@ -20,6 +20,7 @@ export class SocialProtectionPage implements OnInit {
   form: string = "";
   encounters: any[] = [];
   interventionDisplay = 'DREAMS Social  Protection Intervention';
+  activeVisit: any;
 
 
   constructor(
@@ -40,13 +41,15 @@ export class SocialProtectionPage implements OnInit {
       backdropDismiss: true,
       componentProps: {
         patientData: this.patientData,
-        enrollmentData: this.enrollmentData,
-        encounterData: this.encounterData,
-        visitType: this.visitType,
+        activeVisit: this.activeVisit,
+        encounter: encounter,
         encounterType: this.encounterType,
         form: this.form,
-        encounter:encounter
+        visitType: this.activeVisit?.visitType,
+        location: this.activeVisit?.location,
+        patientUuid: this.patientData?.uuid || this.activeVisit?.patient?.uuid
       }
+    
     });
 
     modal.onDidDismiss().then((result) => {
@@ -111,38 +114,19 @@ export class SocialProtectionPage implements OnInit {
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      if (params['data']) {
-        this.patientData = JSON.parse(params['data']);
-      }
-      if (params['enrollmentData']) {
-        this.enrollmentData = JSON.parse(params['enrollmentData']);
-      }
-      if (params['encounterData']) {
-        this.encounterData = JSON.parse(params['encounterData']);
-      }
-      if (params['visit']) {
-        this.visitType = params['visit'];
-      }
-      if (params['encounterType']) {
-        this.encounterType = params['encounterType'];
-      }
-      if (params['form']) {
-        this.form = params['form'];
-      }
-      console.log("Received Data in Behavioural Page:", {
-        patientData: this.patientData,
-        enrollmentData: this.enrollmentData,
-        encounterData: this.encounterData,
-        visitType: this.visitType,
-        encounterType: this.encounterType,
-        form: this.form
-      });
-    });
-    
+    const navState = window.history.state;
+    this.activeVisit = navState.activeVisit;
+    this.encounterType = navState.encounterType;
+    this.form = navState.form
+    this.patientData = navState.patientData,
+
+
+    console.log("Active Visit:", this.activeVisit);
+    console.log("Patient UUID from Active Visit:", this.activeVisit?.patient?.uuid);
+    console.log("Encounter Type:", this.encounterType);
+    console.log('patient data', this.patientData)
 
     this.fetchEncounters();
-    
   }
   
 }

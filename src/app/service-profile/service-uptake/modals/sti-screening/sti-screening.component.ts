@@ -139,6 +139,9 @@ export class StiScreeningComponent implements OnInit {
 
   totalSteps!: number;
   sections!: { questions: ({ label: string; concept: string; type: string; options?: undefined; } | { label: string; concept: string; type: string; options: { value: string; label: string; }[]; })[]; formGroup: FormGroup<any>; }[];
+  activeVisit: any;
+  location: any;
+  patientUuid: any;
 
   constructor(
     private modalCtrl: ModalController,
@@ -177,20 +180,24 @@ export class StiScreeningComponent implements OnInit {
       });
     });
 
-    this.patientData = this.navParams.get('patientData');
-    this.enrollmentData = this.navParams.get('enrollmentData');
-    this.encounterData = this.navParams.get('encounterData');
-    this.visitType = this.navParams.get('visitType');
+    this.activeVisit = this.navParams.get('activeVisit');
     this.encounterType = this.navParams.get('encounterType');
     this.form = this.navParams.get('form');
+    this.patientData = this.navParams.get('patientData');
+    this.visitType = this.navParams.get('visitType');
+    this.location = this.navParams.get('location');
+    this.patientUuid = this.navParams.get('patientUuid');
+    this.encounter = this.navParams.get('encounter');
 
     console.log("Modal Data Received:", {
-      patientData: this.patientData,
-      enrollmentData: this.enrollmentData,
-      encounterData: this.encounterData,
-      visitType: this.visitType,
+      activeVisit: this.activeVisit,
       encounterType: this.encounterType,
-      form: this.form
+      form: this.form,
+      patientData: this.patientData,
+      visitType: this.visitType,
+      location: this.location,
+      patientUuid: this.patientUuid,
+      encounter: this.encounter
     });
 
     if (this.encounter) {
@@ -204,32 +211,36 @@ export class StiScreeningComponent implements OnInit {
       console.warn('Encounter or observations are missing, skipping form population.');
       return;
     }
-  
-    const responsesArray = this.stiForm.get('responses') as FormArray;
+
     const obs = this.encounter.obs;
-  
+
     obs.forEach((ob: any) => {
-      const question = this.questions.find((q) => q.concept === ob.concept.uuid);
-      if (question) {
-        const index = this.questions.indexOf(question);
-        if (index !== -1) {
-          const control = responsesArray.at(index);
-          if (control) {
+      this.sections.forEach((section) => {
+        const question = section.questions.find((q) => q.concept === ob.concept.uuid) as {
+          label: string;
+          concept: string;
+          type: string;
+          options?: { label: string; value: any }[];
+        };
+
+        if (question) {
+          const formGroup = section.formGroup;
+          if (formGroup && formGroup.controls[question.concept]) { // Check if control exists
             let value = this.extractValue(ob.display);
-  
+
             if (question.type === 'radio' && question.options) {
               const option = question.options.find((opt) => opt.label === value);
               if (option) {
-                control.setValue(option.value);
+                formGroup.get(question.concept)?.setValue(option.value);
               }
             } else if (question.type === 'date' || question.type === 'text') {
-              control.setValue(value);
+              formGroup.get(question.concept)?.setValue(value);
             } else {
-              control.setValue(value);
+              formGroup.get(question.concept)?.setValue(value);
             }
           }
         }
-      }
+      });
     });
   }
   
@@ -266,81 +277,110 @@ export class StiScreeningComponent implements OnInit {
   }
 
   submitForm() {
+    // Validate that the necessary data is present
     if (!this.patientData) {
-      console.error('Patient data is missing');
+      console.error('Patient data is missing.');
       return;
     }
-
+  
     if (!this.questions || !this.secondSection) {
-      console.warn('One or more question sections are missing, skipping form submission.');
+      console.warn('One or more question sections are missing. Skipping form submission.');
       return;
     }
-
+  
     if (!this.stiForm || !this.secondFormGroup) {
       console.error('One or more form groups are missing.');
       return;
     }
-
-
+  
+    // Function to extract observations from the form
     const extractObs = (questions: any[], formGroup: any) => {
       return questions
         .map((question) => {
-          let value = formGroup.value[question.concept];
-
-          if (value !== null && value !== undefined && value !== '') {
-            if (['dropdown', 'radio'].includes(question.type)) {
-              return { concept: question.concept, value: value };
-            }
-            if (['text', 'textarea'].includes(question.type)) {
-              return { concept: question.concept, value: value };
-            }
-
-            if (question.type === 'number') {
-              return { concept: question.concept, value: value };
-            }
-
-            if (question.type === 'date') {
-              return { concept: question.concept, value: value };
-            }
-
-            return { concept: question.concept, value };
+          const value = formGroup.value[question.concept];
+  
+          // Validate and filter out empty or invalid values
+          if (
+            value !== null &&
+            value !== undefined &&
+            !(typeof value === 'string' && value.trim() === '') &&
+            !(Array.isArray(value) && value.length === 0)
+          ) {
+            return {
+              concept: question.concept,
+              value: ['dropdown', 'radio'].includes(question.type) ? value : value
+            };
           }
-
           return null;
         })
-        .filter(Boolean)
+        .filter(Boolean); // Filter out nulls
     };
-
-
-
+  
+    // Combine observations from the questions and form
     const obs = [
       ...extractObs(this.questions, this.stiForm),
-      ...extractObs(this.secondSection, this.secondFormGroup),
-
+      ...extractObs(this.secondSection, this.secondFormGroup)
     ];
-
+  
+    // Validate that necessary identifiers are present
+    const patientUuid = this.patientData.uuid;
+    const locationUuid = this.patientData.identifiers?.[0]?.location?.uuid || null;
+    const visitUuid = this.activeVisit?.uuid || null;
+    const encounterTypeUuid = this.encounterType || 'default-encounter-type-uuid';
+  
+    if (!locationUuid) {
+      console.error('Location UUID is missing from patient data.');
+      return;
+    }
+  
+    if (!this.encounterType) {
+      console.warn('Encounter type is missing. Using default.');
+    }
+  
+    // Prepare the payload to be sent in the request
     const payload = {
-      patient: this.patientData.uuid,
-      visit: this.visitType || null,
-      encounterType: this.encounterType,
-      form: this.form,
-      obs: obs,
+      patient: patientUuid,
+      visit: visitUuid,
+      encounterType: encounterTypeUuid,
+      form: this.form || 'default-form-uuid',
+      obs: obs,  // Only the updated observations
       orders: [],
       diagnoses: [],
-      location: this.patientData.identifiers?.[0]?.location?.uuid || null
+      location: locationUuid
     };
-
+  
     console.log('Payload to be sent:', payload);
-
-    this.encounterService.submitEncounter(payload).subscribe(
-      (response) => {
-        console.log('API Response:', response);
-        this.modalCtrl.dismiss({ refresh: true, data: response });
-      },
-      (error) => {
-        console.error('API Error:', error);
-        this.modalCtrl.dismiss({ refresh: false, error: error });
-      }
-    );
+  
+    // Check if encounter exists, and either update or submit encounter
+    if (this.encounter && this.encounter.uuid) {
+      console.log('Encounter exists, updating encounter with UUID:', this.encounter.uuid);
+  
+      // Update encounter
+      this.encounterService.updateEncounter(this.encounter.uuid, payload).subscribe(
+        (response) => {
+          console.log('Encounter updated successfully:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('Error updating encounter:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    } else {
+      console.log('Encounter does not exist, creating new encounter.');
+  
+      // Submit new encounter
+      this.encounterService.submitEncounter(payload).subscribe(
+        (response) => {
+          console.log('API Response:', response);
+          this.modalCtrl.dismiss({ refresh: true, data: response });
+        },
+        (error) => {
+          console.error('API Error:', error);
+          this.modalCtrl.dismiss({ refresh: false, error });
+        }
+      );
+    }
   }
+  
 }  
