@@ -20,7 +20,7 @@ export class LoginPage implements OnInit {
     const sessionId = sessionStorage.getItem('JSESSIONID');
     console.log('Session ID:', sessionId); // Debug log
     if (sessionId) {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/homy']);
     }
   }
 
