@@ -2,3 +2,71 @@
 @import '@ionic/angular/css/normalize.css';
 @import '@ionic/angular/css/structure.css';
 @import '@ionic/angular/css/typography.css';
+
+ion-content {
+    --background: white; /* Default for light mode */
+    font-size: medium;
+}
+
+.dark ion-content {
+    --background: var(--ion-background-color-dark, #121212); /* Use the dark theme background variable, with a fallback */
+}
+
+ion-title,
+ion-back-button{
+    color: white; /* This color might need adjustment for dark mode */
+}
+
+.dark ion-title,
+.dark ion-back-button {
+    color: var(--ion-text-color-dark, #ffffff); /* Use the dark theme text color variable, with a fallback */
+}
+
+ion-item{
+    --background: white; /* Default for light mode */
+}
+
+.dark ion-item {
+    --background: var(--ion-item-background-dark, #1e1e1e); /* Use a dark item background, with a fallback */
+}
+
+ion-toolbar{
+    --background:#26247B; /* This color might be okay for dark mode too, or you can change it */
+}
+
+.dark ion-toolbar {
+    --background: var(--ion-toolbar-background-dark, #1f1f1f); /* Example of changing toolbar background in dark mode */
+}
+
+ion-footer{
+    --background:#26247B; /* This color might be okay for dark mode too, or you can change it */
+}
+
+.dark ion-footer {
+    --background: var(--ion-toolbar-background-dark, #1f1f1f); /* Example of changing footer background in dark mode */
+}
+
+ion-button{
+  --background:#26247B; /* This color might be okay for dark mode too, or you can change it */
+}
+
+.dark ion-button {
+  --background: var(--ion-color-primary-shade, #3171e0); /* Example of slightly adjusting button color in dark mode */
+}
+
+ion-tab-bar{
+    --background:#26247B; /* This color might be okay for dark mode too, or you can change it */
+}
+
+.dark ion-tab-bar {
+    --background: var(--ion-tab-bar-background-dark, #1f1f1f); /* Example of changing tab bar background in dark mode */
+}
+
+ion-menu-button{
+    color: white; /* This color might need adjustment for dark mode */
+    margin-right: 10px;
+}
+
+.dark ion-menu-button {
+    color: var(--ion-text-color-dark, #ffffff); /* Use the dark theme text color variable, with a fallback */
+}

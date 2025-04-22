@@ -29,7 +29,7 @@ export class RegistrationPage implements OnInit {
       required: false
     },
     {
-      label: 'Family Name',
+      label: 'Last Name',
       concept: '166103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       type: 'text',
       required: true
@@ -238,7 +238,7 @@ export class RegistrationPage implements OnInit {
             names: [
               {
                 givenName: formData['First Name'],
-                familyName: formData['Family Name'],
+                familyName: formData['Last Name'],
                 preferred: true
               }
             ],
@@ -321,8 +321,8 @@ export class RegistrationPage implements OnInit {
                 const cleanName = parts[1] || patientName;
             
                 const alert = await this.alertController.create({
-                  header: 'Next Action',
-                  message: 'Do you want to check in the patient or go back home?',
+                  header: 'Registration Successful',
+                  message: 'Do you want to check in the client or go back home?',
                   buttons: [
                     {
                       text: 'Go Home',
